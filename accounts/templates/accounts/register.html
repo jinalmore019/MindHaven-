@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}रजिस्टर{% elif request.session.django_language == 'gu' %}રજિસ્ટર{% else %}Register{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="auth-shell">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}शुरू करें{% elif request.session.django_language == 'gu' %}શરૂ કરો{% else %}Get Started{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}अपना Wellify अकाउंट बनाएं{% elif request.session.django_language == 'gu' %}તમારું Wellify એકાઉન્ટ બનાવો{% else %}Create your Wellify account{% endif %}</h1>
+        <p class="lead">{% if request.session.django_language == 'hi' %}मेंटल वेलनेस टूल्स, जर्नलिंग, असेसमेंट और काउंसलर सपोर्ट एक्सेस करें।{% elif request.session.django_language == 'gu' %}મેન્ટલ વેલનેસ ટૂલ્સ, જર્નલિંગ, મૂલ્યાંકન અને કાઉન્સેલર સપોર્ટ ઍક્સેસ કરો.{% else %}Set up your profile to access mental wellness tools, journaling, assessments, and counsellor support.{% endif %}</p>
+        {% if form.non_field_errors %}
+            <div class="empty-state" style="margin-bottom: 12px;">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" action="{% url 'accounts:register' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">{% if request.session.django_language == 'hi' %}नाम{% elif request.session.django_language == 'gu' %}નામ{% else %}Name{% endif %}</label>
+                {{ form.name }}
+                {% if form.name.errors %}<p>{{ form.name.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_email">{% if request.session.django_language == 'hi' %}ईमेल{% elif request.session.django_language == 'gu' %}ઈમેઈલ{% else %}Email{% endif %}</label>
+                {{ form.email }}
+                {% if form.email.errors %}<p>{{ form.email.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_role">{% if request.session.django_language == 'hi' %}रोल{% elif request.session.django_language == 'gu' %}રોલ{% else %}Role{% endif %}</label>
+                {{ form.role }}
+            </div>
+            <div class="form-group">
+                <label>{{ form.anonymous_flag }} {% if request.session.django_language == 'hi' %}अनाम सपोर्ट प्राथमिकता के साथ जुड़ें{% elif request.session.django_language == 'gu' %}અનામ સપોર્ટ પ્રાધાન્ય સાથે જોડાઓ{% else %}Join with anonymous support preference{% endif %}</label>
+            </div>
+            <div class="form-group">
+                <label for="id_password1">{% if request.session.django_language == 'hi' %}पासवर्ड{% elif request.session.django_language == 'gu' %}પાસવર્ડ{% else %}Password{% endif %}</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}<p>{{ form.password1.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_password2">{% if request.session.django_language == 'hi' %}पासवर्ड कन्फर्म करें{% elif request.session.django_language == 'gu' %}પાસવર્ડ કન્ફર્મ કરો{% else %}Confirm password{% endif %}</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}<p>{{ form.password2.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="button-row">
+                <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}अकाउंट बनाएं{% elif request.session.django_language == 'gu' %}એકાઉન્ટ બનાવો{% else %}Create account{% endif %}</button>
+                <a href="{% url 'accounts:login' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}लॉगिन पर वापस{% elif request.session.django_language == 'gu' %}લૉગિન પર પાછા{% else %}Back to login{% endif %}</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

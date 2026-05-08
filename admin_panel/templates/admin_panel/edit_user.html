@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}View User - Admin Panel{% endblock %}
+{% block content %}
+<section class="auth-shell" style="max-width: 860px;">
+    <div class="card stagger-in">
+        <span class="eyebrow">User Record</span>
+        <h1>{{ user.name }}</h1>
+        <p class="lead">Administrative view-only profile for this platform account. Editing remains disabled to preserve the existing security flow.</p>
+
+        <div class="grid grid-2">
+            <div class="metric-card">
+                <strong>{{ user.role }}</strong>
+                <span>Account role</span>
+            </div>
+            <div class="metric-card">
+                <strong>{{ user.current_stress_level|default:"Low" }}</strong>
+                <span>Current stress level</span>
+            </div>
+        </div>
+
+        <section class="section" style="margin-top: 22px;">
+            <div class="grid grid-2">
+                <div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="form-control" value="{{ user.name }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" class="form-control" value="{{ user.email }}" readonly>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>Risk score</label>
+                        <input type="text" class="form-control" value="{{ user.risk_score }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Latest assessment</label>
+                        <input type="text" class="form-control" value="{% if user_last_assessment %}PHQ {{ user_last_assessment.phq_score|default:'-' }} | GAD {{ user_last_assessment.gad_score|default:'-' }}{% else %}No assessment yet{% endif %}" readonly>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="soft-alert">
+            User information is view-only here. Users continue to manage their own profile through the existing account flow.
+        </div>
+
+        <div class="button-row" style="margin-top: 20px;">
+            <a href="{% url 'admin_panel:manage_users' %}" class="btn btn-secondary">Back to users</a>
+            <a href="{% url 'admin_panel:admin_dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

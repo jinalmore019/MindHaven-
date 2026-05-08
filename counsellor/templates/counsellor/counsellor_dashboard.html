@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}काउंसलर डैशबोर्ड{% elif request.session.django_language == 'gu' %}કાઉન્સેલર ડેશબોર્ડ{% else %}Counsellor Dashboard{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">{% if request.session.django_language == 'hi' %}काउंसलर वर्कस्पेस{% elif request.session.django_language == 'gu' %}કાઉન્સેલર વર્કસ્પેસ{% else %}Counsellor Workspace{% endif %}</span>
+    <h1>{% if request.session.django_language == 'hi' %}छात्र जोखिम और अपॉइंटमेंट ओवरव्यू{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી જોખમ અને એપોઇન્ટમેન્ટ ઓવરવ્યૂ{% else %}Student risk and appointment overview{% endif %}</h1>
+    <p class="lead">{% if request.session.django_language == 'hi' %}उच्च जोखिम वाले छात्रों को प्राथमिकता दें और काउंसलिंग पाइपलाइन को आगे बढ़ाएं।{% elif request.session.django_language == 'gu' %}ઉચ્ચ જોખમ ધરાવતા વિદ્યાર્થીઓને પ્રાથમિકતા આપો અને કાઉન્સેલિંગ પાઇપલાઇન આગળ વધારો.{% else %}Prioritize high-risk students, review recent assessment signals, and move appointments through the counselling pipeline.{% endif %}</p>
+</section>
+
+<section class="section">
+    <div class="metric-grid">
+        <div class="metric-card stagger-in">
+            <strong>{{ total_students }}</strong>
+            <span>{% if request.session.django_language == 'hi' %}छात्र दृश्यता में{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી દૃશ્યતામાં{% else %}Students under visibility{% endif %}</span>
+        </div>
+        <div class="metric-card stagger-in">
+            <strong>{{ high_count }}</strong>
+            <span>{% if request.session.django_language == 'hi' %}उच्च जोखिम छात्र{% elif request.session.django_language == 'gu' %}ઉચ્ચ જોખમ વિદ્યાર્થી{% else %}High-risk students{% endif %}</span>
+        </div>
+        <div class="metric-card stagger-in">
+            <strong>{{ medium_count }}</strong>
+            <span>{% if request.session.django_language == 'hi' %}मध्यम जोखिम छात्र{% elif request.session.django_language == 'gu' %}મધ્યમ જોખમ વિદ્યાર્થી{% else %}Medium-risk students{% endif %}</span>
+        </div>
+        <div class="metric-card stagger-in">
+            <strong>{{ pending_count }}</strong>
+            <span>{% if request.session.django_language == 'hi' %}लंबित अपॉइंटमेंट{% elif request.session.django_language == 'gu' %}બાકી એપોઇન્ટમેન્ટ{% else %}Pending appointments{% endif %}</span>
+        </div>
+        <div class="metric-card stagger-in">
+            <strong>{{ active_sessions_count }}</strong>
+            <span>{% if request.session.django_language == 'hi' %}सक्रिय सेशन{% elif request.session.django_language == 'gu' %}સક્રિય સેશન{% else %}Active sessions{% endif %}</span>
+        </div>
+        <div class="metric-card stagger-in">
+            <strong>{{ completed_sessions_count }}</strong>
+            <span>{% if request.session.django_language == 'hi' %}पूर्ण सेशन{% elif request.session.django_language == 'gu' %}પૂર્ણ સેશન{% else %}Completed sessions{% endif %}</span>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="risk-layout">
+        <div class="risk-column high stagger-in">
+            <h3>{% if request.session.django_language == 'hi' %}उच्च जोखिम{% elif request.session.django_language == 'gu' %}ઉચ્ચ જોખમ{% else %}High Risk{% endif %}</h3>
+            {% for s in high_risk_students %}
+                <article class="person-card">
+                    <header>
+                        <div>
+                            <strong>{{ s.user.name }}</strong>
+                            <div class="muted-small">{{ s.user.email }}</div>
+                        </div>
+                        <span class="pill pill-high">{{ s.user.current_stress_level }}</span>
+                    </header>
+                    <p>PHQ: {{ s.latest_phq|default:"-" }} | GAD: {{ s.latest_gad|default:"-" }}</p>
+                    <div class="action-stack">
+                        <a href="{% url 'counsellor:student_chat_history' s.user.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}चैट खोलें{% elif request.session.django_language == 'gu' %}ચેટ ખોલો{% else %}Open Chat{% endif %}</a>
+                        <a href="{% url 'counsellor:schedule_session' s.user.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}शेड्यूल{% elif request.session.django_language == 'gu' %}શેડ્યૂલ{% else %}Schedule{% endif %}</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state"><p>{% if request.session.django_language == 'hi' %}अभी कोई उच्च जोखिम छात्र नहीं।{% elif request.session.django_language == 'gu' %}હાલ કોઈ ઉચ્ચ જોખમ વિદ્યાર્થી નથી.{% else %}No high-risk students at the moment.{% endif %}</p></div>
+            {% endfor %}
+        </div>
+
+        <div class="risk-column medium stagger-in">
+            <h3>{% if request.session.django_language == 'hi' %}मध्यम जोखिम{% elif request.session.django_language == 'gu' %}મધ્યમ જોખમ{% else %}Medium Risk{% endif %}</h3>
+            {% for s in medium_risk_students %}
+                <article class="person-card">
+                    <header>
+                        <div>
+                            <strong>{{ s.user.name }}</strong>
+                            <div class="muted-small">{{ s.user.email }}</div>
+                        </div>
+                        <span class="pill pill-medium">{{ s.user.current_stress_level }}</span>
+                    </header>
+                    <p>PHQ: {{ s.latest_phq|default:"-" }} | GAD: {{ s.latest_gad|default:"-" }}</p>
+                    <div class="action-stack">
+                        <a href="{% url 'counsellor:student_chat_history' s.user.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}चैट खोलें{% elif request.session.django_language == 'gu' %}ચેટ ખોલો{% else %}Open Chat{% endif %}</a>
+                        <a href="{% url 'counsellor:schedule_session' s.user.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}शेड्यूल{% elif request.session.django_language == 'gu' %}શેડ્યૂલ{% else %}Schedule{% endif %}</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state"><p>{% if request.session.django_language == 'hi' %}अभी कोई मध्यम जोखिम छात्र नहीं।{% elif request.session.django_language == 'gu' %}હાલ કોઈ મધ્યમ જોખમ વિદ્યાર્થી નથી.{% else %}No medium-risk students at the moment.{% endif %}</p></div>
+            {% endfor %}
+        </div>
+
+        <div class="risk-column low stagger-in">
+            <h3>{% if request.session.django_language == 'hi' %}कम जोखिम{% elif request.session.django_language == 'gu' %}ઓછું જોખમ{% else %}Low Risk{% endif %}</h3>
+            {% for s in low_risk_students %}
+                <article class="person-card">
+                    <header>
+                        <div>
+                            <strong>{{ s.user.name }}</strong>
+                            <div class="muted-small">{{ s.user.email }}</div>
+                        </div>
+                        <span class="pill pill-low">{{ s.user.current_stress_level }}</span>
+                    </header>
+                    <p>PHQ: {{ s.latest_phq|default:"-" }} | GAD: {{ s.latest_gad|default:"-" }}</p>
+                    <div class="action-stack">
+                        <a href="{% url 'counsellor:student_chat_history' s.user.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}चैट खोलें{% elif request.session.django_language == 'gu' %}ચેટ ખોલો{% else %}Open Chat{% endif %}</a>
+                        <a href="{% url 'counsellor:schedule_session' s.user.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}शेड्यूल{% elif request.session.django_language == 'gu' %}શેડ્યૂલ{% else %}Schedule{% endif %}</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state"><p>{% if request.session.django_language == 'hi' %}अभी कोई कम जोखिम छात्र नहीं।{% elif request.session.django_language == 'gu' %}હાલ કોઈ ઓછું જોખમ વિદ્યાર્થી નથી.{% else %}No low-risk students at the moment.{% endif %}</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}अपॉइंटमेंट{% elif request.session.django_language == 'gu' %}એપોઇન્ટમેન્ટ{% else %}Appointments{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}सेशन पाइपलाइन{% elif request.session.django_language == 'gu' %}સેશન પાઇપલાઇન{% else %}Session pipeline{% endif %}</h2>
+        {% if appointments %}
+            <ul class="timeline-list">
+                {% for app in appointments %}
+                    <li class="timeline-item">
+                        <div class="timeline-head">
+                            <div>
+                                <strong>{% if app.student %}{{ app.student.name }}{% else %}Student #{{ app.id }}{% endif %}</strong>
+                                <div class="muted-small">{% if app.student %}{{ app.student.email }}{% endif %}</div>
+                            </div>
+                            {% if app.status == 'Pending' %}
+                                <span class="pill pill-medium">{% if request.session.django_language == 'hi' %}लंबित{% elif request.session.django_language == 'gu' %}બાકી{% else %}Pending{% endif %}</span>
+                            {% elif app.status == 'Completed' %}
+                                <span class="pill pill-low">{% if request.session.django_language == 'hi' %}पूर्ण{% elif request.session.django_language == 'gu' %}પૂર્ણ{% else %}Completed{% endif %}</span>
+                            {% else %}
+                                <span class="pill">{{ app.status }}</span>
+                            {% endif %}
+                        </div>
+                        <p>{% if request.session.django_language == 'hi' %}तारीख{% elif request.session.django_language == 'gu' %}તારીખ{% else %}Date{% endif %}: {{ app.date }}</p>
+                        <div class="action-stack">
+                            {% if app.status == 'Pending' %}
+                                <form method="post" action="{% url 'counsellor:appointment_update' app.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" name="status" value="Approved" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}अप्रूव करें{% elif request.session.django_language == 'gu' %}મંજૂર કરો{% else %}Approve{% endif %}</button>
+                                </form>
+                            {% endif %}
+                            {% if app.status == 'Pending' or app.status == 'Approved' %}
+                                <form method="post" action="{% url 'counsellor:appointment_update' app.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" name="status" value="Completed" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}पूर्ण करें{% elif request.session.django_language == 'gu' %}પૂર્ણ કરો{% else %}Mark completed{% endif %}</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state"><p>{% if request.session.django_language == 'hi' %}अभी कोई अपॉइंटमेंट नहीं।{% elif request.session.django_language == 'gu' %}હાલ કોઈ એપોઇન્ટમેન્ટ નથી.{% else %}No appointments yet.{% endif %}</p></div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

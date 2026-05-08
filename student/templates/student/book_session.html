@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}सेशन बुक करें{% elif request.session.django_language == 'gu' %}સેશન બુક કરો{% else %}Book Session{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="auth-shell" style="max-width: 760px;">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}काउंसलिंग सपोर्ट{% elif request.session.django_language == 'gu' %}કાઉન્સેલિંગ સપોર્ટ{% else %}Counselling Support{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}काउंसलिंग सेशन बुक करें{% elif request.session.django_language == 'gu' %}કાઉન્સેલિંગ સેશન બુક કરો{% else %}Request a counselling session{% endif %}</h1>
+        <p class="lead">{% if request.session.django_language == 'hi' %}पसंदीदा तारीख और समय चुनें, हम आपको उपलब्ध काउंसलर से जोड़ेंगे।{% elif request.session.django_language == 'gu' %}પ્રિય તારીખ અને સમય પસંદ કરો, અમે તમને ઉપલબ્ધ કાઉન્સેલર સાથે જોડીશું.{% else %}Choose a preferred date and time and we will route your request to an available counsellor.{% endif %}</p>
+        <form method="post" action="{% url 'student:book_session' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date">{% if request.session.django_language == 'hi' %}पसंदीदा तारीख{% elif request.session.django_language == 'gu' %}પ્રિય તારીખ{% else %}Preferred date{% endif %}</label>
+                <input type="date" name="date" id="date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="time_slot">{% if request.session.django_language == 'hi' %}पसंदीदा समय{% elif request.session.django_language == 'gu' %}પ્રિય સમય{% else %}Preferred time slot{% endif %}</label>
+                <select name="time_slot" id="time_slot" class="form-control">
+                    <option value="">{% if request.session.django_language == 'hi' %}समय चुनें (वैकल्पिक){% elif request.session.django_language == 'gu' %}સમય પસંદ કરો (વૈકલ્પિક){% else %}Select a time (optional){% endif %}</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}अपॉइंटमेंट बुक करें{% elif request.session.django_language == 'gu' %}એપોઇન્ટમેન્ટ બુક કરો{% else %}Request appointment{% endif %}</button>
+                <a href="{% url 'student:student_dashboard' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}वापस जाएं{% elif request.session.django_language == 'gu' %}પાછા જાઓ{% else %}Back to dashboard{% endif %}</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

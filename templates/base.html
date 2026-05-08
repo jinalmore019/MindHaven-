@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Wellness Connect{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-shell">
+        <header class="site-header">
+            <nav class="navbar">
+                <a href="{% if user.is_authenticated %}{% url 'accounts:role_redirect' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="brand">
+                    <span class="brand-mark">W</span>
+                    <span class="brand-copy">
+                        <strong>Wellify</strong>
+                        <span>Mental wellness platform for students</span>
+                    </span>
+                </a>
+                <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+                <div class="nav-links" id="primary-nav">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:role_redirect' %}" class="nav-link">Dashboard</a>
+                        <a href="{% url 'accounts:profile' %}" class="nav-link">My Profile</a>
+                        <span class="nav-pill">{{ user.name }} - {{ user.role }}</span>
+                        <a href="{% url 'accounts:logout' %}" class="nav-link">Logout</a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="nav-link">Login</a>
+                        <a href="{% url 'accounts:register' %}" class="btn">Create account</a>
+                    {% endif %}
+                    <form action="{% url 'accounts:set_language' %}" method="post" class="lang-switch">
+                        {% csrf_token %}
+                        <label for="site-language">Language</label>
+                        <select id="site-language" name="language" class="form-control">
+                            <option value="en" {% if request.session.django_language|default:'en' == "en" %}selected{% endif %}>English</option>
+                            <option value="hi" {% if request.session.django_language == "hi" %}selected{% endif %}>Hindi</option>
+                            <option value="gu" {% if request.session.django_language == "gu" %}selected{% endif %}>Gujarati</option>
+                        </select>
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    </form>
+                </div>
+            </nav>
+        </header>
+        <main class="page-wrap">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% block extra_js %}{% endblock %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navbar = document.querySelector('.navbar');
+        const navToggle = document.querySelector('.nav-toggle');
+        const navLinks = document.querySelector('#primary-nav');
+
+        if (navbar && navToggle && navLinks) {
+            navToggle.addEventListener('click', function() {
+                const isOpen = navbar.classList.toggle('nav-open');
+                navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                navToggle.textContent = isOpen ? 'Close' : 'Menu';
+            });
+
+            navLinks.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 820 && navbar.classList.contains('nav-open')) {
+                        navbar.classList.remove('nav-open');
+                        navToggle.setAttribute('aria-expanded', 'false');
+                        navToggle.textContent = 'Menu';
+                    }
+                });
+            });
+        }
+
+        const languageSelect = document.querySelector('#site-language');
+        if (languageSelect && languageSelect.form) {
+            languageSelect.addEventListener('change', function() {
+                languageSelect.form.submit();
+            });
+        }
+
+        const passwordInputs = document.querySelectorAll('input[type="password"]');
+
+        passwordInputs.forEach(function(input) {
+            if (input.parentElement.classList.contains('password-wrapper')) {
+                return;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'password-wrapper';
+
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'password-toggle';
+            toggleBtn.textContent = 'Show';
+
+            toggleBtn.addEventListener('click', function() {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggleBtn.textContent = 'Hide';
+                } else {
+                    input.type = 'password';
+                    toggleBtn.textContent = 'Show';
+                }
+            });
+
+            wrapper.appendChild(toggleBtn);
+            input.classList.add('has-password-toggle');
+        });
+
+        // Dark/Light mode toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            if (themeToggle) themeToggle.textContent = '☀️';
+        }
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                const isLight = document.body.classList.toggle('light-mode');
+                themeToggle.textContent = isLight ? '☀️' : '🌙';
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            });
+        }
+
+        const forms = document.querySelectorAll('form');
+        forms.forEach(function(form) {
+            form.setAttribute('novalidate', 'novalidate');
+
+            const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+            requiredFields.forEach(function(field) {
+                const clearError = function() {
+                    field.classList.remove('is-invalid');
+                    field.setCustomValidity('');
+                };
+
+                field.addEventListener('input', clearError);
+                field.addEventListener('change', clearError);
+                field.addEventListener('blur', function() {
+                    if (!field.checkValidity()) {
+                        field.classList.add('is-invalid');
+                    }
+                });
+            });
+
+            form.addEventListener('submit', function(event) {
+                let hasError = false;
+                const invalidFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+                invalidFields.forEach(function(field) {
+                    field.setCustomValidity('');
+
+                    if (field.validity.valueMissing) {
+                        field.setCustomValidity('This field is required.');
+                    }
+
+                    if (!field.checkValidity()) {
+                        field.classList.add('is-invalid');
+                        if (!hasError) {
+                            hasError = true;
+                            field.focus();
+                        }
+                    }
+                });
+
+                if (hasError) {
+                    event.preventDefault();
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

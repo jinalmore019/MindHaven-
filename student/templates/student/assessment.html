@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}असेसमेंट{% elif request.session.django_language == 'gu' %}મૂલ્યાંકન{% else %}Assessment{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">PHQ-9 & GAD-7</span>
+    <h1>{% if request.session.django_language == 'hi' %}मानसिक स्वास्थ्य असेसमेंट{% elif request.session.django_language == 'gu' %}માનસિક સ્વાસ્થ્ય મૂલ્યાંકન{% else %}Mental Health Assessment{% endif %}</h1>
+    <p class="lead">{% if request.session.django_language == 'hi' %}पिछले 2 हफ्तों में आप कितनी बार इन समस्याओं से परेशान हुए? (0 = बिल्कुल नहीं, 3 = लगभग हर दिन){% elif request.session.django_language == 'gu' %}છેલ્લા 2 અઠવાડિયામાં તમે આ સમસ્યાઓથી કેટલી વાર પરેશાન થયા? (0 = બિલ્કુલ નહીં, 3 = લગભગ દરરોજ){% else %}Over the last 2 weeks, how often have you been bothered by the following? (0 = Not at all, 3 = Nearly every day){% endif %}</p>
+</section>
+
+<div class="card stagger-in">
+    <form method="post" action="{% url 'student:assessment' %}">
+        {% csrf_token %}
+        <h2>{% if request.session.django_language == 'hi' %}PHQ-9 (अवसाद){% elif request.session.django_language == 'gu' %}PHQ-9 (ડિપ્રેશન){% else %}PHQ-9 (Depression){% endif %}</h2>
+
+        {% for label in "12345678" %}{% endfor %}
+        {% with questions_hi="चीजों में कम रुचि या आनंद|उदास, निराश या निराशाजनक महसूस करना|नींद न आना या बहुत ज्यादा सोना|थकान या कम ऊर्जा|खराब भूख या ज्यादा खाना|खुद के बारे में बुरा महसूस करना|ध्यान केंद्रित करने में परेशानी|धीरे चलना या बेचैन रहना|खुद को नुकसान पहुंचाने के विचार" questions_gu="વસ્તુઓમાં ઓછી રુચિ|ઉદાસ અથવા નિરાશ અનુભવ|ઊંઘ ન આવવી|થાક અથવા ઓછી ઊર્જા|ખરાબ ભૂખ|પોતા વિશે ખરાબ અનુભવ|ધ્યાન કેન્દ્રિત કરવામાં મુશ્કેલી|ધીમે ચાલવું અથવા બેચેની|પોતાને નુકસાન પહોંચાડવાના વિચારો" questions_en="Little interest or pleasure in doing things|Feeling down, depressed, or hopeless|Trouble falling or staying asleep|Feeling tired or little energy|Poor appetite or overeating|Feeling bad about yourself|Trouble concentrating|Moving slowly or being fidgety|Thoughts of being better off dead" %}
+
+        {% for i in "123456789" %}
+        <div class="form-group" style="padding:14px;border-radius:12px;background:rgba(109,144,199,0.05);margin-bottom:10px;">
+            <label style="font-weight:600;">
+                {{ forloop.counter }}.
+                {% if request.session.django_language == 'hi' %}
+                    {% if forloop.counter == 1 %}चीजों में कम रुचि या आनंद{% elif forloop.counter == 2 %}उदास, निराश या निराशाजनक महसूस करना{% elif forloop.counter == 3 %}नींद न आना या बहुत ज्यादा सोना{% elif forloop.counter == 4 %}थकान या कम ऊर्जा{% elif forloop.counter == 5 %}खराब भूख या ज्यादा खाना{% elif forloop.counter == 6 %}खुद के बारे में बुरा महसूस करना{% elif forloop.counter == 7 %}ध्यान केंद्रित करने में परेशानी{% elif forloop.counter == 8 %}धीरे चलना या बेचैन रहना{% elif forloop.counter == 9 %}खुद को नुकसान पहुंचाने के विचार{% endif %}
+                {% elif request.session.django_language == 'gu' %}
+                    {% if forloop.counter == 1 %}વસ્તુઓમાં ઓછી રુચિ{% elif forloop.counter == 2 %}ઉદાસ અથવા નિરાશ અનુભવ{% elif forloop.counter == 3 %}ઊંઘ ન આવવી{% elif forloop.counter == 4 %}થાક અથવા ઓછી ઊર્જા{% elif forloop.counter == 5 %}ખરાબ ભૂખ{% elif forloop.counter == 6 %}પોતા વિશે ખરાબ અનુભવ{% elif forloop.counter == 7 %}ધ્યાન કેન્દ્રિત કરવામાં મુશ્કેલી{% elif forloop.counter == 8 %}ધીમે ચાલવું અથવા બેચેની{% elif forloop.counter == 9 %}પોતાને નુકસાન પહોંચાડવાના વિચારો{% endif %}
+                {% else %}
+                    {% if forloop.counter == 1 %}Little interest or pleasure in doing things{% elif forloop.counter == 2 %}Feeling down, depressed, or hopeless{% elif forloop.counter == 3 %}Trouble falling or staying asleep{% elif forloop.counter == 4 %}Feeling tired or little energy{% elif forloop.counter == 5 %}Poor appetite or overeating{% elif forloop.counter == 6 %}Feeling bad about yourself{% elif forloop.counter == 7 %}Trouble concentrating{% elif forloop.counter == 8 %}Moving slowly or being fidgety{% elif forloop.counter == 9 %}Thoughts of being better off dead{% endif %}
+                {% endif %}
+            </label>
+            <select name="q{{ forloop.counter }}" class="form-control" style="max-width:200px;margin-top:8px;">
+                <option value="0">0 - {% if request.session.django_language == 'hi' %}बिल्कुल नहीं{% elif request.session.django_language == 'gu' %}બિલ્કુલ નહીં{% else %}Not at all{% endif %}</option>
+                <option value="1">1 - {% if request.session.django_language == 'hi' %}कुछ दिन{% elif request.session.django_language == 'gu' %}કેટલાક દિવસ{% else %}Several days{% endif %}</option>
+                <option value="2">2 - {% if request.session.django_language == 'hi' %}आधे से ज्यादा दिन{% elif request.session.django_language == 'gu' %}અડધાથી વધુ દિવસ{% else %}More than half the days{% endif %}</option>
+                <option value="3">3 - {% if request.session.django_language == 'hi' %}लगभग हर दिन{% elif request.session.django_language == 'gu' %}લગભગ દરરોજ{% else %}Nearly every day{% endif %}</option>
+            </select>
+        </div>
+        {% endfor %}
+        {% endwith %}
+
+        <h2 style="margin-top:24px;">{% if request.session.django_language == 'hi' %}GAD-7 (चिंता){% elif request.session.django_language == 'gu' %}GAD-7 (ચિંતા){% else %}GAD-7 (Anxiety){% endif %}</h2>
+
+        {% for i in "1234567" %}
+        <div class="form-group" style="padding:14px;border-radius:12px;background:rgba(109,144,199,0.05);margin-bottom:10px;">
+            <label style="font-weight:600;">
+                {{ forloop.counter }}.
+                {% if request.session.django_language == 'hi' %}
+                    {% if forloop.counter == 1 %}घबराहट, बेचैनी या तनाव महसूस करना{% elif forloop.counter == 2 %}चिंता को रोक न पाना{% elif forloop.counter == 3 %}अलग-अलग चीजों की बहुत ज्यादा चिंता{% elif forloop.counter == 4 %}आराम करने में परेशानी{% elif forloop.counter == 5 %}इतनी बेचैनी कि बैठना मुश्किल{% elif forloop.counter == 6 %}आसानी से चिड़चिड़ा हो जाना{% elif forloop.counter == 7 %}कुछ बुरा होने का डर{% endif %}
+                {% elif request.session.django_language == 'gu' %}
+                    {% if forloop.counter == 1 %}ગભરાટ અથવા તણાવ{% elif forloop.counter == 2 %}ચિંતા રોકી ન શકવી{% elif forloop.counter == 3 %}વિવિધ બાબતોની વધુ ચિંતા{% elif forloop.counter == 4 %}આરામ કરવામાં મુશ્કેલી{% elif forloop.counter == 5 %}બેઠા ન રહી શકવું{% elif forloop.counter == 6 %}સહેલાઈથી ચીડ ચઢવી{% elif forloop.counter == 7 %}કંઈ ખરાબ થવાનો ડર{% endif %}
+                {% else %}
+                    {% if forloop.counter == 1 %}Feeling nervous, anxious, or on edge{% elif forloop.counter == 2 %}Not being able to stop or control worrying{% elif forloop.counter == 3 %}Worrying too much about different things{% elif forloop.counter == 4 %}Trouble relaxing{% elif forloop.counter == 5 %}Being so restless it is hard to sit still{% elif forloop.counter == 6 %}Becoming easily annoyed or irritable{% elif forloop.counter == 7 %}Feeling afraid as if something awful might happen{% endif %}
+                {% endif %}
+            </label>
+            <select name="g{{ forloop.counter }}" class="form-control" style="max-width:200px;margin-top:8px;">
+                <option value="0">0 - {% if request.session.django_language == 'hi' %}बिल्कुल नहीं{% elif request.session.django_language == 'gu' %}બિલ્કુલ નહીં{% else %}Not at all{% endif %}</option>
+                <option value="1">1 - {% if request.session.django_language == 'hi' %}कुछ दिन{% elif request.session.django_language == 'gu' %}કેટલાક દિવસ{% else %}Several days{% endif %}</option>
+                <option value="2">2 - {% if request.session.django_language == 'hi' %}आधे से ज्यादा दिन{% elif request.session.django_language == 'gu' %}અડધાથી વધુ દિવસ{% else %}More than half the days{% endif %}</option>
+                <option value="3">3 - {% if request.session.django_language == 'hi' %}लगभग हर दिन{% elif request.session.django_language == 'gu' %}લગભગ દરરોજ{% else %}Nearly every day{% endif %}</option>
+            </select>
+        </div>
+        {% endfor %}
+
+        <div class="button-row" style="margin-top:20px;">
+            <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}असेसमेंट सबमिट करें{% elif request.session.django_language == 'gu' %}મૂલ્યાંકન સબમિટ કરો{% else %}Submit Assessment{% endif %}</button>
+            <a href="{% url 'student:student_dashboard' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}वापस जाएं{% elif request.session.django_language == 'gu' %}પાછા જાઓ{% else %}Back to Dashboard{% endif %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

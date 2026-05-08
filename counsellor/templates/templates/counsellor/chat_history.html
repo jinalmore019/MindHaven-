@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Chat History – {{ student.name }}{% endblock %}
+{% block content %}
+<h1>Chat history: {{ student.name }}</h1>
+<p><a href="{% url 'counsellor:counsellor_dashboard' %}" class="btn">Back to Dashboard</a></p>
+<div class="card">
+    {% if chat_logs %}
+    <table>
+        <thead><tr><th>Time</th><th>Message</th><th>Response</th><th>Stress</th></tr></thead>
+        <tbody>
+            {% for log in chat_logs %}
+            <tr>
+                <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+                <td>{{ log.message }}</td>
+                <td>{{ log.response }}</td>
+                <td>{{ log.stress_level }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No chat history for this student.</p>
+    {% endif %}
+</div>
+{% endblock %}

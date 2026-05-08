@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% block title %}Chatbot - Wellness Connect{% endblock %}
+
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">AI Support</span>
+    <h1>Wellify Chat Support</h1>
+    <p class="lead">
+        Share what feels heavy, distracting, or overwhelming. Wellify responds with practical support, gentle reflection,
+        and recommends human help when risk looks high.
+    </p>
+</section>
+
+<section class="chat-layout">
+    <div class="card stagger-in">
+        <div id="chat-box" class="chat-box"></div>
+        <div class="chat-composer">
+            <input type="text" id="chat-input" class="form-control" placeholder="Tell me what is going on for you today...">
+            <button id="chat-send" class="btn">Send message</button>
+        </div>
+        <div class="form-group" style="margin-top: 10px;">
+            <label for="chat-language">Chat language</label>
+            <select id="chat-language" class="form-control">
+                <option value="en" {% if chat_language == 'en' %}selected{% endif %}>English</option>
+                <option value="hi" {% if chat_language == 'hi' %}selected{% endif %}>Hindi (Hinglish)</option>
+                <option value="gu" {% if chat_language == 'gu' %}selected{% endif %}>Gujarati</option>
+            </select>
+        </div>
+        <div class="suggestion-row">
+            <button type="button" class="suggestion-chip">I feel anxious about exams</button>
+            <button type="button" class="suggestion-chip">I am not sleeping well</button>
+            <button type="button" class="suggestion-chip">I feel low and unmotivated</button>
+            <button type="button" class="suggestion-chip">I feel lonely in college</button>
+            <button type="button" class="suggestion-chip">start screening</button>
+            <button type="button" class="suggestion-chip">0</button>
+            <button type="button" class="suggestion-chip">1</button>
+            <button type="button" class="suggestion-chip">2</button>
+            <button type="button" class="suggestion-chip">3</button>
+        </div>
+        <div id="alert-box" class="soft-alert" style="display:none;">
+            We recommend booking a counselling session and reaching out to a trusted person if things feel urgent.
+        </div>
+    </div>
+    <aside class="card stagger-in">
+        <span class="eyebrow">{% if chatbot_is_ai_powered %}Live AI{% else %}Smart Fallback{% endif %}</span>
+        <h2>How this chat helps</h2>
+        <p><strong>Current risk status:</strong> <span id="risk-level-pill" class="pill {% if current_risk_level == 'High' %}pill-high{% elif current_risk_level == 'Medium' %}pill-medium{% else %}pill-low{% endif %}">{{ current_risk_level }}</span></p>
+        <p>
+            {% if chatbot_is_ai_powered %}
+                This chat is currently using the configured AI model <strong>{{ chatbot_model_name }}</strong> for more contextual support.
+            {% else %}
+                This chat is currently using the built-in support engine. Add an OpenAI API key in your environment to make it behave more like ChatGPT with richer conversational responses.
+            {% endif %}
+        </p>
+        <ul class="list-clean chat-tips">
+            <li>Be specific about stress, sleep, motivation, exams, loneliness, anxiety, or burnout.</li>
+            <li>You can type <strong>start screening</strong> to do the PHQ-9 and GAD-7 flow inside chat.</li>
+            <li>If your safety is at risk, contact emergency support or a crisis helpline immediately.</li>
+        </ul>
+        <div class="button-row" style="margin-top: 18px;">
+            <a href="{% url 'student:assessment' %}" class="btn btn-secondary">Take assessment</a>
+            <a href="{% url 'student:book_session' %}" class="btn btn-secondary">Book counsellor</a>
+            <a href="{% url 'student:chatbot_export_pdf' %}" class="btn btn-secondary">Export chat PDF</a>
+        </div>
+    </aside>
+</section>
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send');
+    const chatBox = document.getElementById('chat-box');
+    const alertBox = document.getElementById('alert-box');
+    const suggestionChips = document.querySelectorAll('.suggestion-chip');
+    const riskPill = document.getElementById('risk-level-pill');
+    const languageSelect = document.getElementById('chat-language');
+    let isLoading = false;
+
+    function addMessage(text, sender, metaText) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chat-message ' + sender;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+        bubble.textContent = text;
+
+        wrapper.appendChild(bubble);
+        if (metaText) {
+            const meta = document.createElement('div');
+            meta.className = 'muted-small';
+            meta.style.marginTop = '6px';
+            meta.textContent = metaText;
+            wrapper.appendChild(meta);
+        }
+        chatBox.appendChild(wrapper);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function setTyping(isTyping) {
+        if (isTyping && !document.getElementById('typing-indicator')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chat-message bot';
+            wrapper.id = 'typing-indicator';
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.textContent = 'Wellify is typing...';
+            wrapper.appendChild(bubble);
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        if (!isTyping) {
+            const existing = document.getElementById('typing-indicator');
+            if (existing) existing.remove();
+        }
+    }
+
+    function updateRiskPill(level) {
+        if (!level || !riskPill) return;
+        riskPill.textContent = level;
+        riskPill.classList.remove('pill-low', 'pill-medium', 'pill-high');
+        if (level === 'High') {
+            riskPill.classList.add('pill-high');
+        } else if (level === 'Medium') {
+            riskPill.classList.add('pill-medium');
+        } else {
+            riskPill.classList.add('pill-low');
+        }
+    }
+
+    function loadHistory() {
+        fetch("{% url 'student:chatbot_history' %}", { credentials: 'same-origin' })
+            .then(res => res.json())
+            .then(data => {
+                const history = data.history || [];
+                if (!history.length) {
+                    addMessage("Hi, I'm Wellify. Tell me how you're feeling, what is stressing you, or what kind of support would help today.", 'bot');
+                    return;
+                }
+                history.forEach(item => {
+                    addMessage(item.user_message, 'user', item.timestamp);
+                    addMessage(item.bot_response, 'bot', 'Stress: ' + (item.stress_level || 'Low'));
+                });
+            })
+            .catch(() => {
+                addMessage("Hi, I'm Wellify. Tell me how you're feeling, what is stressing you, or what kind of support would help today.", 'bot');
+            });
+    }
+
+    function submitMessage() {
+        if (isLoading) return;
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        input.value = '';
+        isLoading = true;
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
+        setTyping(true);
+
+        const formData = new FormData();
+        formData.append('message', message);
+        formData.append('language', languageSelect ? languageSelect.value : 'en');
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        fetch("{% url 'student:chatbot_send' %}", {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(res => res.json())
+        .then(data => {
+            setTyping(false);
+            addMessage(data.response, 'bot');
+            alertBox.style.display = data.show_alert ? 'block' : 'none';
+            updateRiskPill(data.risk_level);
+        })
+        .catch(() => {
+            setTyping(false);
+            addMessage('Something went wrong. Please try again.', 'bot');
+        })
+        .finally(() => {
+            isLoading = false;
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send message';
+        });
+    }
+
+    sendBtn.addEventListener('click', submitMessage);
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            submitMessage();
+        }
+    });
+    suggestionChips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            input.value = chip.textContent;
+            input.focus();
+        });
+    });
+
+    loadHistory();
+});
+</script>
+{% endblock %}

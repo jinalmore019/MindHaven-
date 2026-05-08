@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Counsellor Dashboard – Wellness Connect{% endblock %}
+{% block content %}
+<h1>Welcome, {{ user.name }}!</h1>
+<p style="color: #666; margin-bottom: 24px;">Counsellor Dashboard</p>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Assigned Students</h2>
+    <p>View and manage your assigned students here.</p>
+    <div style="padding: 16px; background: #f8f9fa; border-radius: 6px; margin-top: 12px;">
+        <p style="margin: 0; color: #666;">No assigned students at the moment.</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Appointments</h2>
+    <p>View and manage upcoming appointments.</p>
+    <div style="padding: 16px; background: #f8f9fa; border-radius: 6px; margin-top: 12px;">
+        <p style="margin: 0; color: #666;">No appointments scheduled.</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Quick Actions</h2>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="#" class="btn" style="flex: 1; min-width: 150px; text-align: center;">
+            👥 View Students
+        </a>
+        <a href="#" class="btn" style="flex: 1; min-width: 150px; text-align: center;">
+            📅 Manage Appointments
+        </a>
+    </div>
+</div>
+{% endblock %}

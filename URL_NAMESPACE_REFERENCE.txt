@@ -1,0 +1,147 @@
+═══════════════════════════════════════════════════════════════
+            WELLIFY - URL NAMESPACE QUICK REFERENCE
+═══════════════════════════════════════════════════════════════
+
+📋 CORRECT REDIRECT PATTERNS
+═══════════════════════════════════════════════════════════════
+
+ROLE: STUDENT
+✅ redirect("student:student_dashboard")
+✅ URL: /student/
+✅ View: student/views.py:student_dashboard()
+
+ROLE: COUNSELLOR
+✅ redirect("counsellor:counsellor_dashboard")
+✅ URL: /counsellor/
+✅ View: counsellor/views.py:counsellor_dashboard()
+
+ROLE: ADMIN
+✅ redirect("admin_panel:admin_dashboard")
+✅ URL: /admin_panel/
+✅ View: admin_panel/views.py:admin_dashboard()
+
+═══════════════════════════════════════════════════════════════
+            NAMESPACE MAPPING TABLE
+═══════════════════════════════════════════════════════════════
+
+App Name      | Namespace      | URL Prefix    | app_name
+--------------|----------------|---------------|------------------
+accounts      | accounts:      | /             | 'accounts'
+student       | student:       | /student/     | 'student'
+counsellor    | counsellor:    | /counsellor/  | 'counsellor'
+admin_panel   | admin_panel:   | /admin_panel/ | 'admin_panel'
+
+═══════════════════════════════════════════════════════════════
+            COMMON URL PATTERNS
+═══════════════════════════════════════════════════════════════
+
+ACCOUNTS APP (accounts:)
+├── accounts:login              → /login/
+├── accounts:register           → /register/
+├── accounts:logout             → /logout/
+└── accounts:role_redirect      → /redirect/
+
+STUDENT APP (student:)
+├── student:student_dashboard   → /student/
+├── student:chatbot             → /student/chatbot/
+├── student:assessment          → /student/assessment/
+├── student:meditation_list     → /student/meditation/
+├── student:breathing_list      → /student/breathing/
+├── student:journal_list        → /student/journal/
+└── student:motivation_list     → /student/motivation/
+
+COUNSELLOR APP (counsellor:)
+├── counsellor:counsellor_dashboard → /counsellor/
+├── counsellor:appointment_update   → /counsellor/appointment/<id>/
+├── counsellor:student_chat_history → /counsellor/student/<id>/chat/
+└── counsellor:schedule_session     → /counsellor/student/<id>/schedule/
+
+ADMIN PANEL APP (admin_panel:)
+├── admin_panel:admin_dashboard → /admin_panel/
+├── admin_panel:manage_users    → /admin_panel/manage-users/
+├── admin_panel:edit_user       → /admin_panel/edit-user/<id>/
+└── admin_panel:delete_user     → /admin_panel/delete-user/<id>/
+
+═══════════════════════════════════════════════════════════════
+            TEMPLATE USAGE EXAMPLES
+═══════════════════════════════════════════════════════════════
+
+IN TEMPLATES:
+{% url 'accounts:login' %}
+{% url 'student:chatbot' %}
+{% url 'admin_panel:manage_users' %}
+{% url 'admin_panel:edit_user' user.id %}
+
+IN VIEWS:
+redirect('accounts:login')
+redirect('student:student_dashboard')
+redirect('admin_panel:admin_dashboard')
+redirect('admin_panel:edit_user', user_id=user.id)
+
+═══════════════════════════════════════════════════════════════
+            COMMON MISTAKES & FIXES
+═══════════════════════════════════════════════════════════════
+
+❌ WRONG: redirect("accounts:admin_dashboard")
+✅ RIGHT: redirect("admin_panel:admin_dashboard")
+
+❌ WRONG: redirect("admin_dashboard")
+✅ RIGHT: redirect("admin_panel:admin_dashboard")
+
+❌ WRONG: redirect("/admin_panel/")
+✅ RIGHT: redirect("admin_panel:admin_dashboard")
+
+❌ WRONG: {% url 'admin_dashboard' %}
+✅ RIGHT: {% url 'admin_panel:admin_dashboard' %}
+
+═══════════════════════════════════════════════════════════════
+            ROLE-BASED REDIRECT LOGIC
+═══════════════════════════════════════════════════════════════
+
+if user.role == "Student":
+    return redirect("student:student_dashboard")
+    
+elif user.role == "Counsellor":
+    return redirect("counsellor:counsellor_dashboard")
+    
+elif user.role == "Admin":
+    return redirect("admin_panel:admin_dashboard")
+
+═══════════════════════════════════════════════════════════════
+            DEBUGGING TIPS
+═══════════════════════════════════════════════════════════════
+
+1. CHECK NAMESPACE EXISTS:
+   Look for: app_name = 'namespace_name' in urls.py
+
+2. CHECK ROUTE NAME:
+   Look for: name='route_name' in path()
+
+3. CHECK INCLUDE:
+   Verify app is included in main urls.py
+
+4. TEST URL RESOLUTION:
+   python manage.py shell
+   >>> from django.urls import reverse
+   >>> reverse('admin_panel:admin_dashboard')
+   '/admin_panel/'
+
+═══════════════════════════════════════════════════════════════
+            QUICK TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+ERROR: NoReverseMatch for 'admin_dashboard'
+FIX: Use correct namespace: 'admin_panel:admin_dashboard'
+
+ERROR: NoReverseMatch for 'student_dashboard'
+FIX: Use correct namespace: 'student:student_dashboard'
+
+ERROR: Circular import
+FIX: Remove self-includes in urls.py
+
+ERROR: Page not found (404)
+FIX: Check URL pattern and namespace
+
+═══════════════════════════════════════════════════════════════
+            STATUS: ✅ ALL FIXED
+═══════════════════════════════════════════════════════════════

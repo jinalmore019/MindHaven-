@@ -1,0 +1,168 @@
+═══════════════════════════════════════════════════════════════
+                WELLIFY - URL STRUCTURE (FIXED)
+═══════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│                  wellness_connect/urls.py                   │
+│                     (Main Project URLs)                     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     ▼
+┌───────────────┐    ┌───────────────┐    ┌───────────────┐
+│  /admin/      │    │  /            │    │  /student/    │
+│  Django Admin │    │  accounts/    │    │  student/     │
+└───────────────┘    └───────────────┘    └───────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    ▼                   ▼
+            ┌───────────────┐   ┌───────────────┐
+            │ /counsellor/  │   │ /admin_panel/ │
+            │ counsellor/   │   │ admin_panel/  │
+            └───────────────┘   └───────────────┘
+
+═══════════════════════════════════════════════════════════════
+                    DETAILED URL MAPPING
+═══════════════════════════════════════════════════════════════
+
+📁 ACCOUNTS APP (/)
+├── /                           → Login page
+├── /login/                     → Login page
+├── /register/                  → Register page
+├── /logout/                    → Logout
+└── /redirect/                  → Role-based redirect
+
+📁 ADMIN PANEL APP (/admin_panel/)
+├── /admin_panel/               → Admin dashboard
+├── /admin_panel/manage-users/  → Manage all users
+├── /admin_panel/edit-user/1/   → Edit user #1
+├── /admin_panel/delete-user/1/ → Delete user #1
+└── /admin_panel/user/1/delete/ → Legacy delete (backward compat)
+
+📁 STUDENT APP (/student/)
+├── /student/                   → Student dashboard
+├── /student/chatbot/           → Chatbot interface
+├── /student/chatbot/send/      → Send chatbot message
+├── /student/assessment/        → Take assessment
+├── /student/assessment/result/ → Assessment results
+├── /student/book/              → Book counselling session
+│
+├── Wellness Content:
+├── /student/meditation/        → Meditation list
+├── /student/meditation/abc123/ → Meditation detail
+├── /student/breathing/         → Breathing exercises list
+├── /student/breathing/abc123/  → Breathing exercise detail
+├── /student/journal/           → Journal list
+├── /student/journal/create/    → Create journal entry
+├── /student/journal/abc123/    → Journal detail
+├── /student/journal/abc123/delete/ → Delete journal entry
+├── /student/motivation/        → Motivation content list
+└── /student/motivation/abc123/ → Motivation detail
+
+📁 COUNSELLOR APP (/counsellor/)
+├── /counsellor/                → Counsellor dashboard
+├── /counsellor/appointment/abc123/ → Update appointment
+├── /counsellor/student/1/chat/ → View student #1 chat history
+└── /counsellor/student/1/schedule/ → Schedule session with student #1
+
+📁 DJANGO ADMIN (/admin/)
+└── /admin/                     → Django admin interface
+
+═══════════════════════════════════════════════════════════════
+                    BEFORE vs AFTER
+═══════════════════════════════════════════════════════════════
+
+❌ BEFORE (BROKEN):
+
+wellness_connect/urls.py
+    ├── includes admin_panel/urls.py
+    │       └── includes admin_panel/urls.py  ← CIRCULAR!
+    │               └── includes admin_panel/urls.py
+    │                       └── includes admin_panel/urls.py
+    │                               └── ... INFINITE LOOP!
+
+✅ AFTER (FIXED):
+
+wellness_connect/urls.py
+    ├── includes accounts/urls.py       ✓
+    ├── includes student/urls.py        ✓
+    ├── includes counsellor/urls.py     ✓
+    └── includes admin_panel/urls.py    ✓
+            └── (no further includes)   ✓
+
+═══════════════════════════════════════════════════════════════
+                    USER FLOW EXAMPLES
+═══════════════════════════════════════════════════════════════
+
+🎓 STUDENT FLOW:
+1. Visit http://localhost:8000/
+2. Login as Student
+3. Redirected to /student/
+4. Access features:
+   - /student/chatbot/
+   - /student/meditation/
+   - /student/journal/
+
+👨‍⚕️ COUNSELLOR FLOW:
+1. Visit http://localhost:8000/login/
+2. Login as Counsellor
+3. Redirected to /counsellor/
+4. View students and appointments
+
+👨‍💼 ADMIN FLOW:
+1. Visit http://localhost:8000/login/
+2. Login as Admin
+3. Redirected to /admin_panel/
+4. Manage users at /admin_panel/manage-users/
+
+═══════════════════════════════════════════════════════════════
+                    ROUTE NAMING CONVENTION
+═══════════════════════════════════════════════════════════════
+
+Format: app_name:route_name
+
+Examples:
+✓ accounts:login              → /login/
+✓ accounts:register           → /register/
+✓ student:chatbot             → /student/chatbot/
+✓ student:meditation_list     → /student/meditation/
+✓ counsellor:counsellor_dashboard → /counsellor/
+✓ admin_panel:manage_users    → /admin_panel/manage-users/
+✓ admin_panel:edit_user       → /admin_panel/edit-user/<id>/
+
+Usage in templates:
+{% url 'accounts:login' %}
+{% url 'student:chatbot' %}
+{% url 'admin_panel:manage_users' %}
+
+═══════════════════════════════════════════════════════════════
+                    TESTING COMMANDS
+═══════════════════════════════════════════════════════════════
+
+# Start server
+python manage.py runserver
+
+# Check for issues
+python manage.py check
+
+# Test URL resolution
+python manage.py shell
+>>> from django.urls import reverse
+>>> reverse('accounts:login')
+'/login/'
+>>> reverse('admin_panel:manage_users')
+'/admin_panel/manage-users/'
+
+═══════════════════════════════════════════════════════════════
+                    STATUS: ✅ FIXED
+═══════════════════════════════════════════════════════════════
+
+All circular includes removed
+All routes properly configured
+Server starts successfully
+No infinite recursion
+Production ready
+
+═══════════════════════════════════════════════════════════════

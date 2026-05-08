@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}जर्नल{% elif request.session.django_language == 'gu' %}જર્નલ{% else %}Journal{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">{% if request.session.django_language == 'hi' %}पर्सनल जर्नल{% elif request.session.django_language == 'gu' %}વ્યક્તિગત જર્નલ{% else %}Personal Journal{% endif %}</span>
+    <h1>{% if request.session.django_language == 'hi' %}आपका जर्नल{% elif request.session.django_language == 'gu' %}તમારું જર્નલ{% else %}Your Journal{% endif %}</h1>
+    <div class="button-row">
+        <a href="{% url 'student:journal_create' %}" class="btn">{% if request.session.django_language == 'hi' %}+ नई एंट्री{% elif request.session.django_language == 'gu' %}+ નવી એન્ટ્રી{% else %}+ New Entry{% endif %}</a>
+        <a href="{% url 'student:student_dashboard' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}वापस जाएं{% elif request.session.django_language == 'gu' %}પાછા જાઓ{% else %}Back to Dashboard{% endif %}</a>
+    </div>
+</section>
+
+<div class="card stagger-in">
+    {% if entries %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% if request.session.django_language == 'hi' %}तारीख{% elif request.session.django_language == 'gu' %}તારીખ{% else %}Date{% endif %}</th>
+                        <th>{% if request.session.django_language == 'hi' %}मूड{% elif request.session.django_language == 'gu' %}મૂડ{% else %}Mood{% endif %}</th>
+                        <th>{% if request.session.django_language == 'hi' %}स्ट्रेस{% elif request.session.django_language == 'gu' %}સ્ટ્રેસ{% else %}Stress{% endif %}</th>
+                        <th>{% if request.session.django_language == 'hi' %}प्रीव्यू{% elif request.session.django_language == 'gu' %}પ્રીવ્યૂ{% else %}Preview{% endif %}</th>
+                        <th>{% if request.session.django_language == 'hi' %}एक्शन{% elif request.session.django_language == 'gu' %}એક્શન{% else %}Actions{% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.created_at|date:"d M Y, h:i A" }}</td>
+                        <td>{{ entry.mood|default:"–" }}</td>
+                        <td>
+                            {% if entry.stress_level == 'High' %}
+                                <span class="pill pill-high">{% if request.session.django_language == 'hi' %}उच्च{% elif request.session.django_language == 'gu' %}ઉચ્ચ{% else %}High{% endif %}</span>
+                            {% elif entry.stress_level == 'Medium' %}
+                                <span class="pill pill-medium">{% if request.session.django_language == 'hi' %}मध्यम{% elif request.session.django_language == 'gu' %}મધ્યમ{% else %}Medium{% endif %}</span>
+                            {% else %}
+                                <span class="pill pill-low">{% if request.session.django_language == 'hi' %}कम{% elif request.session.django_language == 'gu' %}ઓછું{% else %}Low{% endif %}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ entry.content|truncatewords:10 }}</td>
+                        <td>
+                            <div class="action-stack">
+                                <a href="{% url 'student:journal_detail' entry.id %}" class="btn btn-secondary" style="min-height:36px;padding:6px 14px;font-size:0.85rem;">{% if request.session.django_language == 'hi' %}देखें{% elif request.session.django_language == 'gu' %}જુઓ{% else %}View{% endif %}</a>
+                                <form method="post" action="{% url 'student:journal_delete' entry.id %}" onsubmit="return confirm('{% if request.session.django_language == 'hi' %}इस एंट्री को डिलीट करें?{% elif request.session.django_language == 'gu' %}આ એન્ટ્રી ડિલીટ કરો?{% else %}Delete this entry?{% endif %}')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger" style="min-height:36px;padding:6px 14px;font-size:0.85rem;">{% if request.session.django_language == 'hi' %}डिलीट{% elif request.session.django_language == 'gu' %}ડિલીટ{% else %}Delete{% endif %}</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>{% if request.session.django_language == 'hi' %}अभी कोई जर्नल एंट्री नहीं है। अपनी पहली एंट्री लिखें!{% elif request.session.django_language == 'gu' %}હજુ સુધી કોઈ જર્નલ એન્ટ્રી નથી. તમારી પ્રથમ એન્ટ્રી લખો!{% else %}No journal entries yet. Start your first entry!{% endif %}</p>
+            <a href="{% url 'student:journal_create' %}" class="btn" style="margin-top:12px;">{% if request.session.django_language == 'hi' %}पहली एंट्री लिखें{% elif request.session.django_language == 'gu' %}પ્રથમ એન્ટ્રી લખો{% else %}Write first entry{% endif %}</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

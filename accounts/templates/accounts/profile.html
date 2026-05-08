@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}मेरी प्रोफाइल{% elif request.session.django_language == 'gu' %}મારી પ્રોફાઇલ{% else %}My Profile{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="auth-shell" style="max-width: 980px;">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}अकाउंट सेटिंग्स{% elif request.session.django_language == 'gu' %}એકાઉન્ટ સેટિંગ્સ{% else %}Account Settings{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}मेरी प्रोफाइल{% elif request.session.django_language == 'gu' %}મારી પ્રોફાઇલ{% else %}My profile{% endif %}</h1>
+        <p class="lead">{% if request.session.django_language == 'hi' %}अपनी व्यक्तिगत जानकारी और पासवर्ड अपडेट करें।{% elif request.session.django_language == 'gu' %}તમારી વ્યક્તિગત માહિતી અને પાસવર્ડ અપડેટ કરો.{% else %}Manage your personal information and password.{% endif %}</p>
+
+        <div class="metric-grid" style="margin-bottom: 22px;">
+            <div class="metric-card">
+                <strong>{{ user.role }}</strong>
+                <span>{% if request.session.django_language == 'hi' %}वर्तमान रोल{% elif request.session.django_language == 'gu' %}વર્તમાન રોલ{% else %}Current role{% endif %}</span>
+            </div>
+            <div class="metric-card">
+                <strong>{{ user.current_stress_level|default:"Low" }}</strong>
+                <span>{% if request.session.django_language == 'hi' %}वेलबीइंग स्थिति{% elif request.session.django_language == 'gu' %}સુખાકારી સ્થિતિ{% else %}Wellbeing status{% endif %}</span>
+            </div>
+            <div class="metric-card">
+                <strong>{{ user.risk_score }}</strong>
+                <span>{% if request.session.django_language == 'hi' %}जोखिम स्कोर{% elif request.session.django_language == 'gu' %}જોખમ સ્કોર{% else %}Risk score{% endif %}</span>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <section class="section">
+                <span class="eyebrow">{% if request.session.django_language == 'hi' %}व्यक्तिगत विवरण{% elif request.session.django_language == 'gu' %}વ્યક્તિગત વિગત{% else %}Personal Details{% endif %}</span>
+                <div class="grid grid-2" style="margin-top: 16px;">
+                    <div class="form-group">
+                        <label for="name">{% if request.session.django_language == 'hi' %}पूरा नाम{% elif request.session.django_language == 'gu' %}પૂરું નામ{% else %}Full name{% endif %}</label>
+                        <input type="text" id="name" name="name" class="form-control" value="{{ user.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">{% if request.session.django_language == 'hi' %}ईमेल{% elif request.session.django_language == 'gu' %}ઈમેઈલ{% else %}Email address{% endif %}</label>
+                        <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="role_display">Role</label>
+                    <input type="text" id="role_display" class="form-control" value="{{ user.role }}" readonly>
+                </div>
+            </section>
+
+            <section class="section">
+                <span class="eyebrow">{% if request.session.django_language == 'hi' %}पासवर्ड अपडेट{% elif request.session.django_language == 'gu' %}પાસવર્ડ અપડેટ{% else %}Password Update{% endif %}</span>
+                <p style="margin-top: 16px;">{% if request.session.django_language == 'hi' %}केवल नाम या ईमेल अपडेट करना हो तो ये खाली छोड़ें।{% elif request.session.django_language == 'gu' %}ફક્ત નામ અથવા ઈમેઈલ અપડેટ કરવું હોય તો આ ખાલી છોડો.{% else %}Leave these fields empty if you only want to update your name or email.{% endif %}</p>
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label for="current_password">Current password</label>
+                        <input type="password" id="current_password" name="current_password" class="form-control" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password">New password</label>
+                        <input type="password" id="new_password" name="new_password" class="form-control" placeholder="Enter new password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm new password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm new password">
+                </div>
+            </section>
+
+            <div class="soft-alert">
+                Role changes are intentionally disabled. Password updates require your current password.
+            </div>
+
+            <div class="button-row" style="margin-top: 20px;">
+                <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}बदलाव सेव करें{% elif request.session.django_language == 'gu' %}ફેરફાર સેવ કરો{% else %}Save changes{% endif %}</button>
+                <a href="{% if user.role == 'Student' %}{% url 'student:student_dashboard' %}{% elif user.role == 'Counsellor' %}{% url 'counsellor:counsellor_dashboard' %}{% elif user.role == 'Admin' %}{% url 'admin_panel:admin_dashboard' %}{% endif %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}वापस जाएं{% elif request.session.django_language == 'gu' %}પાછા જાઓ{% else %}Back to dashboard{% endif %}</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

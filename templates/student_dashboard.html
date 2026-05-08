@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard – Wellness Connect{% endblock %}
+{% block content %}
+<h1>Welcome, {{ user.name }}!</h1>
+<p style="color: #666; margin-bottom: 8px;">Student Dashboard</p>
+<p>Current stress level: <strong>{{ stress }}</strong></p>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Quick Actions</h2>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        
+        <!-- Chatbot -->
+        <a href="{% url 'student:chatbot' %}" 
+            class="btn" 
+            style="flex: 1; min-width: 150px; text-align: center;">
+            💬 Chatbot
+        </a>
+
+        <!-- Assessment -->
+        <a href="{% url 'student:assessment' %}" 
+           class="btn" 
+           style="flex: 1; min-width: 150px; text-align: center;">
+            📋 Take Assessment
+        </a>
+
+        <!-- Book Session -->
+        <a href="{% url 'student:book_session' %}" 
+           class="btn" 
+           style="flex: 1; min-width: 150px; text-align: center;">
+            📅 Book Session
+        </a>
+
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Your Wellness Journey</h2>
+    <p>Use the buttons above to access mental health resources and support.</p>
+    <ul style="line-height: 1.8;">
+        <li><strong>Chatbot:</strong> Get instant support and guidance</li>
+        <li><strong>Assessment:</strong> Complete PHQ-9 mental health assessment</li>
+        <li><strong>Book Session:</strong> Schedule a counselling appointment</li>
+    </ul>
+</div>
+
+<!-- Wellness Tools - Always Available -->
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Wellness Tools</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <a href="{% url 'student:meditation_list' %}" class="btn" style="text-align: center;">
+            🧘 Meditation
+        </a>
+        <a href="{% url 'student:breathing_list' %}" class="btn" style="text-align: center;">
+            🌬️ Breathing Exercises
+        </a>
+        <a href="{% url 'student:journal_list' %}" class="btn" style="text-align: center;">
+            ✍️ Journal
+        </a>
+        <a href="{% url 'student:motivation_list' %}" class="btn" style="text-align: center;">
+            💡 Motivation
+        </a>
+    </div>
+</div>
+
+<!-- Stress-based recommendations -->
+{% if stress == 'Low' %}
+<div class="card" style="background-color: #e8f5e9;">
+    <h3 style="margin-top: 0; color: #2e7d32;">You're doing great!</h3>
+    <p>Keep up the good work with meditation and journaling to maintain your wellbeing.</p>
+</div>
+{% elif stress == 'Medium' %}
+<div class="card" style="background-color: #fff3e0;">
+    <h3 style="margin-top: 0; color: #e65100;">Take a moment for yourself</h3>
+    <p>Try breathing exercises and consider booking a counselling session for additional support.</p>
+</div>
+{% elif stress == 'High' %}
+<div class="card" style="background-color: #ffebee;">
+    <h3 style="margin-top: 0; color: #c62828;">Important Update</h3>
+    <p style="color: #b00;"><strong>A counsellor has been notified and will reach out to you shortly.</strong></p>
+    <p>Please use the wellness tools above and consider booking a session. You're not alone.</p>
+</div>
+{% endif %}
+{% endblock %}

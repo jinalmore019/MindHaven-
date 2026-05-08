@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users - Admin Panel{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">{% if request.session.django_language == 'hi' %}यूजर डायरेक्टरी{% elif request.session.django_language == 'gu' %}યુઝર ડિરેક્ટરી{% else %}User Directory{% endif %}</span>
+    <h1>{% if request.session.django_language == 'hi' %}यूजर मैनेज करें{% elif request.session.django_language == 'gu' %}યુઝર મેનેજ કરો{% else %}Manage Users{% endif %}</h1>
+    <div class="button-row">
+        <span class="nav-pill">{{ user_count }} {% if request.session.django_language == 'hi' %}यूजर{% elif request.session.django_language == 'gu' %}યુઝર{% else %}users{% endif %}</span>
+        <a href="{% url 'admin_panel:admin_dashboard' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}डैशबोर्ड पर वापस{% elif request.session.django_language == 'gu' %}ડેશબોર્ડ પર પાછા{% else %}Back to dashboard{% endif %}</a>
+    </div>
+</section>
+
+<section class="section stagger-in">
+    <div class="card">
+        <h2>{% if request.session.django_language == 'hi' %}नया यूजर बनाएं{% elif request.session.django_language == 'gu' %}નવો યુઝર બનાવો{% else %}Create New User{% endif %}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label>{% if request.session.django_language == 'hi' %}पूरा नाम{% elif request.session.django_language == 'gu' %}પૂરું નામ{% else %}Full Name{% endif %}</label>
+                    <input type="text" name="name" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}नाम डालें{% elif request.session.django_language == 'gu' %}નામ દાખલ કરો{% else %}Enter full name{% endif %}" required>
+                </div>
+                <div class="form-group">
+                    <label>{% if request.session.django_language == 'hi' %}ईमेल{% elif request.session.django_language == 'gu' %}ઈમેઈલ{% else %}Email{% endif %}</label>
+                    <input type="email" name="email" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}ईमेल डालें{% elif request.session.django_language == 'gu' %}ઈમેઈલ દાખલ કરો{% else %}Enter email{% endif %}" required>
+                </div>
+                <div class="form-group">
+                    <label>{% if request.session.django_language == 'hi' %}रोल{% elif request.session.django_language == 'gu' %}રોલ{% else %}Role{% endif %}</label>
+                    <select name="role" class="form-control" required>
+                        <option value="">{% if request.session.django_language == 'hi' %}रोल चुनें{% elif request.session.django_language == 'gu' %}રોલ પસંદ કરો{% else %}Select role{% endif %}</option>
+                        <option value="Student">{% if request.session.django_language == 'hi' %}छात्र{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી{% else %}Student{% endif %}</option>
+                        <option value="Counsellor">{% if request.session.django_language == 'hi' %}काउंसलर{% elif request.session.django_language == 'gu' %}કાઉન્સેલર{% else %}Counsellor{% endif %}</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{% if request.session.django_language == 'hi' %}पासवर्ड{% elif request.session.django_language == 'gu' %}પાસવર્ડ{% else %}Password{% endif %}</label>
+                    <input type="password" name="password" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}कम से कम 6 अक्षर{% elif request.session.django_language == 'gu' %}ઓછામાં ઓછા 6 અક્ષર{% else %}Min 6 characters{% endif %}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}यूजर बनाएं{% elif request.session.django_language == 'gu' %}યુઝર બનાવો{% else %}Create User{% endif %}</button>
+        </form>
+    </div>
+</section>
+
+<section class="section stagger-in">
+    <div class="card">
+        <h2>{% if request.session.django_language == 'hi' %}सभी यूजर{% elif request.session.django_language == 'gu' %}બધા યુઝર{% else %}All Users{% endif %}</h2>
+        {% if users %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{% if request.session.django_language == 'hi' %}नाम{% elif request.session.django_language == 'gu' %}નામ{% else %}Name{% endif %}</th>
+                            <th>{% if request.session.django_language == 'hi' %}ईमेल{% elif request.session.django_language == 'gu' %}ઈમેઈલ{% else %}Email{% endif %}</th>
+                            <th>{% if request.session.django_language == 'hi' %}रोल{% elif request.session.django_language == 'gu' %}રોલ{% else %}Role{% endif %}</th>
+                            <th>{% if request.session.django_language == 'hi' %}स्ट्रेस{% elif request.session.django_language == 'gu' %}સ્ટ્રેસ{% else %}Stress{% endif %}</th>
+                            <th>{% if request.session.django_language == 'hi' %}एक्शन{% elif request.session.django_language == 'gu' %}એક્શન{% else %}Action{% endif %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user_item in users %}
+                            <tr>
+                                <td>{{ user_item.name }}</td>
+                                <td>{{ user_item.email }}</td>
+                                <td>
+                                    {% if user_item.role == 'Student' %}
+                                        <span class="pill pill-low">{% if request.session.django_language == 'hi' %}छात्र{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી{% else %}Student{% endif %}</span>
+                                    {% elif user_item.role == 'Counsellor' %}
+                                        <span class="pill pill-medium">{% if request.session.django_language == 'hi' %}काउंसलर{% elif request.session.django_language == 'gu' %}કાઉન્સેલર{% else %}Counsellor{% endif %}</span>
+                                    {% else %}
+                                        <span class="pill">Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user_item.current_stress_level == 'High' %}
+                                        <span class="pill pill-high">{% if request.session.django_language == 'hi' %}उच्च{% elif request.session.django_language == 'gu' %}ઉચ્ચ{% else %}High{% endif %}</span>
+                                    {% elif user_item.current_stress_level == 'Medium' %}
+                                        <span class="pill pill-medium">{% if request.session.django_language == 'hi' %}मध्यम{% elif request.session.django_language == 'gu' %}મધ્યમ{% else %}Medium{% endif %}</span>
+                                    {% else %}
+                                        <span class="pill pill-low">{% if request.session.django_language == 'hi' %}कम{% elif request.session.django_language == 'gu' %}ઓછું{% else %}Low{% endif %}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user_item.id != user.id %}
+                                        <form method="post" action="{% url 'admin_panel:delete_user' user_item.id %}" onsubmit="return confirm('{% if request.session.django_language == 'hi' %}क्या आप {{ user_item.name }} को डिलीट करना चाहते हैं?{% elif request.session.django_language == 'gu' %}શું તમે {{ user_item.name }} ને ડિલીટ કરવા માંગો છો?{% else %}Delete {{ user_item.name }}?{% endif %}')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger" style="min-height:36px;padding:6px 14px;font-size:0.85rem;">{% if request.session.django_language == 'hi' %}डिलीट{% elif request.session.django_language == 'gu' %}ડિલીટ{% else %}Delete{% endif %}</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="muted-small">{% if request.session.django_language == 'hi' %}आप{% elif request.session.django_language == 'gu' %}તમે{% else %}You{% endif %}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state"><p>{% if request.session.django_language == 'hi' %}कोई यूजर नहीं मिला।{% elif request.session.django_language == 'gu' %}કોઈ યુઝર મળ્યો નથી.{% else %}No users found.{% endif %}</p></div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

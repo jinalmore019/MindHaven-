@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}ERP LMS Integration - Wellness Connect{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">ERP and LMS</span>
+    <h1>Institution data integration</h1>
+    <p class="lead">Connect the portal to an external ERP or LMS source and import users through the existing CSV workflow.</p>
+    <div class="button-row">
+        <a href="{% url 'admin_panel:admin_dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+    </div>
+</section>
+
+<section class="split-panel section">
+    <div class="card stagger-in">
+        <span class="eyebrow">Connection Status</span>
+        <h2>{% if connection_status %}Connected{% else %}Not connected{% endif %}</h2>
+        <p>
+            {% if connection_status %}
+                The integration demo is active and ready for CSV-based user import.
+            {% else %}
+                Connect first to unlock the CSV import panel.
+            {% endif %}
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            {% if connection_status %}
+                <input type="hidden" name="action" value="disconnect">
+                <button type="submit" class="btn">Disconnect integration</button>
+            {% else %}
+                <input type="hidden" name="action" value="connect">
+                <button type="submit" class="btn">Connect integration</button>
+            {% endif %}
+        </form>
+    </div>
+    <aside class="card stagger-in">
+        <span class="eyebrow">Import Rules</span>
+        <h2>CSV format</h2>
+        <ul class="timeline-list">
+            <li class="timeline-item">Columns required: <strong>name, email, role</strong></li>
+            <li class="timeline-item">Role values: <strong>Student, Counsellor, Admin</strong></li>
+            <li class="timeline-item">Duplicate emails are skipped automatically</li>
+            <li class="timeline-item">Default password remains <strong>Welcome@123</strong></li>
+        </ul>
+    </aside>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">Bulk Import</span>
+        <h2>Upload users from CSV</h2>
+        {% if connection_status %}
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload_csv">
+                <div class="form-group">
+                    <label for="csvFile">CSV file</label>
+                    <input type="file" name="csv_file" id="csvFile" class="form-control" accept=".csv" required>
+                </div>
+                <div class="button-row">
+                    <button type="submit" class="btn">Upload and create users</button>
+                </div>
+            </form>
+            <div class="card" style="margin-top: 18px; padding: 20px;">
+                <h3>Sample CSV</h3>
+                <p><code>name,email,role</code></p>
+                <p><code>John Doe,john@example.com,Student</code></p>
+                <p><code>Jane Smith,jane@example.com,Counsellor</code></p>
+                <p><code>Admin User,admin@example.com,Admin</code></p>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>Connect the integration first to enable CSV upload.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

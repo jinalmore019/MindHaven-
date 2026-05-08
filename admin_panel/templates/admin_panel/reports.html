@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Reports - Wellness Connect{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">Reports and Exports</span>
+    <h1>Mental health and service analytics</h1>
+    <p class="lead">Review assessment patterns, high-risk trends, and counselling throughput. Export reports for administrative review.</p>
+    <div class="button-row">
+        <a href="{% url 'admin_panel:export_csv' %}" class="btn">Export CSV</a>
+        <a href="{% url 'admin_panel:export_pdf' %}" class="btn btn-secondary">Export PDF</a>
+        <a href="{% url 'admin_panel:admin_dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="grid grid-2">
+        <div class="card stagger-in">
+            <span class="eyebrow">Mental Health Metrics</span>
+            <h2>Assessment overview</h2>
+            <ul class="timeline-list">
+                <li class="timeline-item"><div class="timeline-head"><strong>PHQ-9 average</strong><span>{{ phq_avg }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>GAD-7 average</strong><span>{{ gad_avg }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>Low stress students</strong><span class="pill pill-low">{{ stress_low }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>Medium stress students</strong><span class="pill pill-medium">{{ stress_medium }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>High stress students</strong><span class="pill pill-high">{{ stress_high }}</span></div></li>
+            </ul>
+        </div>
+        <div class="card stagger-in">
+            <span class="eyebrow">Operational Metrics</span>
+            <h2>Session delivery</h2>
+            <ul class="timeline-list">
+                <li class="timeline-item"><div class="timeline-head"><strong>Total sessions booked</strong><span>{{ total_sessions }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>Completed sessions</strong><span class="pill pill-low">{{ completed_sessions }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>Pending sessions</strong><span class="pill pill-medium">{{ pending_sessions }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>High-risk in last 7 days</strong><span class="pill pill-high">{{ high_risk_7_days }}</span></div></li>
+                <li class="timeline-item"><div class="timeline-head"><strong>High-risk in last 30 days</strong><span class="pill pill-high">{{ high_risk_30_days }}</span></div></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="split-panel section">
+    <div class="card stagger-in">
+        <span class="eyebrow">Visual Reports</span>
+        <h2>Distribution snapshots</h2>
+        <div class="grid grid-2">
+            <div class="card" style="padding: 20px;">
+                <h3>Stress distribution</h3>
+                <div class="chart-shell">
+                    <canvas id="stressPieChart"></canvas>
+                </div>
+            </div>
+            <div class="card" style="padding: 20px;">
+                <h3>Counsellor session load</h3>
+                <div class="chart-shell">
+                    <canvas id="counsellorBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <aside class="card stagger-in">
+        <span class="eyebrow">Counsellor Performance</span>
+        <h2>Session counts by counsellor</h2>
+        {% for counsellor in counsellor_stats %}
+            <div class="timeline-item">
+                <div class="timeline-head">
+                    <strong>{{ counsellor.name }}</strong>
+                    <span>{{ counsellor.sessions }} sessions</span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state"><p>No counsellors found.</p></div>
+        {% endfor %}
+    </aside>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const stressPieCtx = document.getElementById('stressPieChart').getContext('2d');
+new Chart(stressPieCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Low', 'Medium', 'High'],
+        datasets: [{
+            data: [{{ stress_low }}, {{ stress_medium }}, {{ stress_high }}],
+            backgroundColor: ['#58a487', '#c79a57', '#ca6a76'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+const counsellorBarCtx = document.getElementById('counsellorBarChart').getContext('2d');
+new Chart(counsellorBarCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for c in counsellor_stats %}'{{ c.name|escapejs }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for c in counsellor_stats %}{{ c.sessions }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: '#6d90c7',
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{{ item.title }} – Wellness Connect{% endblock %}
+{% block content %}
+<h1>💡 {{ item.title }}</h1>
+<p><a href="{% url 'student:motivation_list' %}" class="btn">Back to Inspiration</a></p>
+
+<div class="card">
+    {% if item.image_url %}
+    <img src="{{ item.image_url }}" alt="Not available" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 24px;">
+    {% endif %}
+
+    <div style="line-height: 1.8; font-size: 16px; margin-bottom: 16px;">
+        {{ item.content }}
+    </div>
+
+    {% if item.author %}
+    <p style="text-align: right; font-style: italic; color: #666;">— {{ item.author }}</p>
+    {% endif %}
+
+    {% if item.category %}
+    <p style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #ddd;">
+        <strong>Category:</strong> {{ item.category }}
+    </p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <p style="text-align: center; font-size: 16px; color: #2d5a87;">
+        <strong>Remember:</strong> You are stronger than you think. One step at a time, you can overcome any challenge.
+    </p>
+</div>
+{% endblock %}

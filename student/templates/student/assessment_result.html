@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}असेसमेंट परिणाम{% elif request.session.django_language == 'gu' %}મૂલ્યાંકન પરિણામ{% else %}Assessment Result{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="auth-shell" style="max-width:760px;">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}असेसमेंट परिणाम{% elif request.session.django_language == 'gu' %}મૂલ્યાંકન પરિણામ{% else %}Assessment Result{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}आपका वेलनेस स्कोर{% elif request.session.django_language == 'gu' %}તમારો વેલનેસ સ્કોર{% else %}Your Wellness Score{% endif %}</h1>
+
+        <div class="metric-grid" style="margin:20px 0;">
+            <div class="metric-card">
+                <strong>{{ phq_score }}</strong>
+                <span>PHQ-9 {% if request.session.django_language == 'hi' %}स्कोर{% elif request.session.django_language == 'gu' %}સ્કોર{% else %}Score{% endif %}</span>
+            </div>
+            <div class="metric-card">
+                <strong>{{ gad_score }}</strong>
+                <span>GAD-7 {% if request.session.django_language == 'hi' %}स्कोर{% elif request.session.django_language == 'gu' %}સ્કોર{% else %}Score{% endif %}</span>
+            </div>
+            <div class="metric-card">
+                <strong>
+                    {% if final_level == 'High' %}
+                        <span class="pill pill-high">{% if request.session.django_language == 'hi' %}उच्च{% elif request.session.django_language == 'gu' %}ઉચ્ચ{% else %}High{% endif %}</span>
+                    {% elif final_level == 'Medium' %}
+                        <span class="pill pill-medium">{% if request.session.django_language == 'hi' %}मध्यम{% elif request.session.django_language == 'gu' %}મધ્યમ{% else %}Medium{% endif %}</span>
+                    {% else %}
+                        <span class="pill pill-low">{% if request.session.django_language == 'hi' %}कम{% elif request.session.django_language == 'gu' %}ઓછું{% else %}Low{% endif %}</span>
+                    {% endif %}
+                </strong>
+                <span>{% if request.session.django_language == 'hi' %}जोखिम स्तर{% elif request.session.django_language == 'gu' %}જોખમ સ્તર{% else %}Risk Level{% endif %}</span>
+            </div>
+        </div>
+
+        {% if final_level == 'High' %}
+        <div class="soft-alert" style="margin-bottom:16px;">
+            🚨 {% if request.session.django_language == 'hi' %}एक काउंसलर को सूचित किया गया है। कृपया जल्द से जल्द सेशन बुक करें।{% elif request.session.django_language == 'gu' %}એક કાઉન્સેલરને જાણ કરવામાં આવી છે. કૃપા કરી શક્ય તેટલું વહેલું સેશન બુક કરો.{% else %}A counsellor has been notified. Please book a session as soon as possible.{% endif %}
+        </div>
+        {% elif final_level == 'Medium' %}
+        <div class="messages"><li class="warning">{% if request.session.django_language == 'hi' %}मध्यम स्तर का तनाव। ब्रीदिंग टूल्स और काउंसलिंग सपोर्ट मददगार हो सकते हैं।{% elif request.session.django_language == 'gu' %}મધ્યમ સ્તરનો તણાવ. બ્રેધિંગ ટૂલ્સ અને કાઉન્સેલિંગ સપોર્ટ મદદરૂપ થઈ શકે.{% else %}Moderate stress level. Breathing tools and counselling support can help.{% endif %}</li></div>
+        {% else %}
+        <div class="messages"><li class="success">{% if request.session.django_language == 'hi' %}आप अच्छी स्थिति में हैं। अपनी वेलनेस रूटीन जारी रखें।{% elif request.session.django_language == 'gu' %}તમે સારી સ્થિતિમાં છો. તમારી વેલનેસ રૂટિન ચાલુ રાખો.{% else %}You are in a good place. Keep up your wellness routine.{% endif %}</li></div>
+        {% endif %}
+
+        <div class="button-row" style="margin-top:20px;">
+            <a href="{% url 'student:student_dashboard' %}" class="btn">{% if request.session.django_language == 'hi' %}डैशबोर्ड पर वापस{% elif request.session.django_language == 'gu' %}ડેશબોર્ડ પર પાછા{% else %}Back to Dashboard{% endif %}</a>
+            <a href="{% url 'student:book_session' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}सेशन बुक करें{% elif request.session.django_language == 'gu' %}સેશન બુક કરો{% else %}Book a Session{% endif %}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

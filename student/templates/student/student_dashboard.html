@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard - Wellness Connect{% endblock %}
+{% block content %}
+<section class="hero section">
+    <div class="card hero-panel stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}स्टूडेंट डैशबोर्ड{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી ડેશબોર્ડ{% else %}Student Dashboard{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}वापसी पर स्वागत है, {{ user.name }}{% elif request.session.django_language == 'gu' %}પાછા આવવા બદલ સ્વાગત, {{ user.name }}{% else %}Welcome back, {{ user.name }}{% endif %}</h1>
+        <p class="lead">{% if request.session.django_language == 'hi' %}आपका वेलनेस हब तैयार है - AI सपोर्ट, जर्नलिंग, असेसमेंट और काउंसलर एक्सेस सब एक जगह।{% elif request.session.django_language == 'gu' %}તમારો વેલનેસ હબ તૈયાર છે - AI સપોર્ટ, જર્નલિંગ, મૂલ્યાંકન અને કાઉન્સેલર ઍક્સેસ એક જ જગ્યાએ।{% else %}Your personal wellness hub is ready with guided tools, AI support, reflective journaling, and counsellor access whenever you need it.{% endif %}</p>
+        {% if stress == 'Low' %}
+            <div class="pill pill-low">{% if request.session.django_language == 'hi' %}वर्तमान वेलबीइंग स्थिति{% elif request.session.django_language == 'gu' %}હાલની સુખાકારી સ્થિતિ{% else %}Current wellbeing status{% endif %}: {{ stress }}</div>
+            <p style="margin-top: 16px;">{% if request.session.django_language == 'hi' %}आप स्थिर स्थिति में हैं। छोटे माइंडफुलनेस ब्रेक और सही आराम बनाए रखें।{% elif request.session.django_language == 'gu' %}તમે સ્થિર સ્થિતિમાં છો. નાની માઇન્ડફુલનેસ બ્રેક્સ અને યોગ્ય આરામ જાળવો.{% else %}You're in a steady zone. Keep your momentum with short mindfulness breaks, daily reflection, and intentional rest.{% endif %}</p>
+        {% elif stress == 'Medium' %}
+            <div class="pill pill-medium">{% if request.session.django_language == 'hi' %}वर्तमान वेलबीइंग स्थिति{% elif request.session.django_language == 'gu' %}હાલની સુખાકારી સ્થિતિ{% else %}Current wellbeing status{% endif %}: {{ stress }}</div>
+            <p style="margin-top: 16px;">{% if request.session.django_language == 'hi' %}आप अभी दबाव में हैं। ब्रीदिंग टूल, क्विक असेसमेंट या काउंसलिंग बुकिंग मदद करेगी।{% elif request.session.django_language == 'gu' %}તમે હમણાં દબાણમાં છો. બ્રેધિંગ ટૂલ્સ, ક્વિક મૂલ્યાંકન અથવા કાઉન્સેલિંગ બુકિંગ મદદ કરશે.{% else %}You're carrying some pressure right now. Breathing tools, a quick assessment, or a counselling booking can help you reset.{% endif %}</p>
+        {% else %}
+            <div class="pill pill-high">{% if request.session.django_language == 'hi' %}वर्तमान वेलबीइंग स्थिति{% elif request.session.django_language == 'gu' %}હાલની સુખાકારી સ્થિતિ{% else %}Current wellbeing status{% endif %}: {{ stress }}</div>
+            <p style="margin-top: 16px;">{% if request.session.django_language == 'hi' %}आपके लिए सपोर्ट प्राथमिकता पर है। जल्द से जल्द मानव सहायता लें।{% elif request.session.django_language == 'gu' %}તમારા માટે સપોર્ટ પ્રાથમિકતામાં છે. શક્ય તેટલું વહેલું માનવીય સહાય લો.{% else %}Support has been prioritized for you. Stay close to grounding resources and reach out for human help as soon as possible.{% endif %}</p>
+        {% endif %}
+        <div class="cta-row">
+            <a href="{% url 'student:chatbot' %}" class="btn">{% if request.session.django_language == 'hi' %}AI चैट सपोर्ट खोलें{% elif request.session.django_language == 'gu' %}AI ચેટ સપોર્ટ ખોલો{% else %}Open AI Chat Support{% endif %}</a>
+            <a href="{% url 'student:assessment' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}मेंटल हेल्थ असेसमेंट लें{% elif request.session.django_language == 'gu' %}મેન્ટલ હેલ્થ મૂલ્યાંકન લો{% else %}Take Mental Health Assessment{% endif %}</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <strong>{{ meditation_count }}</strong>
+                <span>{% if request.session.django_language == 'hi' %}मेडिटेशन सेशन{% elif request.session.django_language == 'gu' %}મેડિટેશન સેશન{% else %}Meditation sessions{% endif %}</span>
+            </div>
+            <div class="stat">
+                <strong>{{ breathing_count }}</strong>
+                <span>{% if request.session.django_language == 'hi' %}ब्रीदिंग संसाधन{% elif request.session.django_language == 'gu' %}બ્રેધિંગ સ્રોતો{% else %}Breathing resources{% endif %}</span>
+            </div>
+            <div class="stat">
+                <strong>{{ motivation_count }}</strong>
+                <span>{% if request.session.django_language == 'hi' %}प्रेरक सामग्री{% elif request.session.django_language == 'gu' %}મોટિવેશનલ વાંચન{% else %}Motivational reads{% endif %}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}क्विक स्टार्ट{% elif request.session.django_language == 'gu' %}ઝડપી શરૂઆત{% else %}Quick Start{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}अभी सबसे ज्यादा किससे मदद मिलेगी?{% elif request.session.django_language == 'gu' %}હમણાં સૌથી વધુ મદદ કઈથી મળશે?{% else %}What would help most right now?{% endif %}</h2>
+        <div class="quick-grid">
+            <a href="{% url 'student:chatbot' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}Wellify AI से बात करें{% elif request.session.django_language == 'gu' %}Wellify AI સાથે વાત કરો{% else %}Talk to Wellify AI{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}भावनात्मक सपोर्ट, व्यावहारिक उपाय और सही अगले कदम का मार्गदर्शन पाएँ।{% elif request.session.django_language == 'gu' %}ભાવનાત્મક સપોર્ટ, વ્યવહારૂ ઉપાયો અને યોગ્ય આગળના પગલાંનું માર્ગદર્શન મેળવો.{% else %}Get contextual emotional support, practical coping ideas, and guidance to the right next step.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:book_session' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}सेशन बुक करें{% elif request.session.django_language == 'gu' %}સેશન બુક કરો{% else %}Book a session{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}जब संरचित मानव सहायता चाहिए हो, तब काउंसलर का समय बुक करें।{% elif request.session.django_language == 'gu' %}જ્યારે ગોઠવેલ માનવીય સહાય જોઈએ, ત્યારે કાઉન્સેલર સાથે સમય બુક કરો.{% else %}Request time with a counsellor when you want structured, human support.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:journal_list' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}जर्नल खोलें{% elif request.session.django_language == 'gu' %}જર્નલ ખોલો{% else %}Open your journal{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}विचार लिखें, मूड ट्रैक करें और अपनी रिफ्लेक्शन एक जगह रखें।{% elif request.session.django_language == 'gu' %}વિચારો લખો, મૂડ ટ્રેક કરો અને રિફ્લેક્શન એક જગ્યાએ રાખો.{% else %}Write through thoughts, capture moods, and keep your reflections in one place.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:breathing_list' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}ब्रीदिंग से रीसेट{% elif request.session.django_language == 'gu' %}બ્રેધિંગથી રીસેટ{% else %}Reset with breathing{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}चिंता कम करने, फोकस बढ़ाने और तनाव नियंत्रित करने के लिए छोटे अभ्यास करें।{% elif request.session.django_language == 'gu' %}ચિંતા શાંત કરવા, ફોકસ સુધારવા અને તણાવ નિયંત્રિત કરવા ટૂંકા અભ્યાસ કરો.{% else %}Use short guided exercises to settle anxiety, improve focus, and regulate stress.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:community_posts' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}दैनिक छात्र पोस्ट{% elif request.session.django_language == 'gu' %}દૈનિક વિદ્યાર્થી પોસ્ટ્સ{% else %}Daily student posts{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}सोशल स्टोरी की तरह दैनिक अपडेट शेयर करें और तनाव संकेत पाएँ।{% elif request.session.django_language == 'gu' %}સોશિયલ સ્ટોરી જેવી દૈનિક અપડેટ શેર કરો અને તણાવ સંકેતો મેળવો.{% else %}Share a daily update like social stories and get stress signals (Low/Medium/High).{% endif %}</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section grid grid-3">
+    <div class="card feature-card stagger-in">
+        <div class="feature-icon">1</div>
+        <h3>{% if request.session.django_language == 'hi' %}अपने मन की स्थिति जांचें{% elif request.session.django_language == 'gu' %}તમારા મનની સ્થિતિ તપાસો{% else %}Check in with your mind{% endif %}</h3>
+        <p>{% if request.session.django_language == 'hi' %}PHQ-9 और GAD-7 असेसमेंट से अपनी भावनात्मक स्थिति और जोखिम स्तर समझें।{% elif request.session.django_language == 'gu' %}PHQ-9 અને GAD-7 મૂલ્યાંકનથી તમારી ભાવનાત્મક સ્થિતિ અને જોખમ સ્તર સમજો.{% else %}Use PHQ-9 and GAD-7 assessments to understand your current emotional load and risk level.{% endif %}</p>
+    </div>
+    <div class="card feature-card stagger-in">
+        <div class="feature-icon">2</div>
+        <h3>{% if request.session.django_language == 'hi' %}सही टूल चुनें{% elif request.session.django_language == 'gu' %}યોગ્ય ટૂલ પસંદ કરો{% else %}Choose the right tool{% endif %}</h3>
+        <p>{% if request.session.django_language == 'hi' %}ज़रूरत के अनुसार चैट, ब्रीदिंग, मेडिटेशन, जर्नलिंग और मोटिवेशनल कंटेंट का उपयोग करें।{% elif request.session.django_language == 'gu' %}જરૂરિયાત મુજબ ચેટ, બ્રેધિંગ, મેડિટેશન, જર્નલિંગ અને પ્રેરણાત્મક સામગ્રીનો ઉપયોગ કરો.{% else %}Move between chat support, breathing exercises, meditations, journaling, and motivational content based on what you need.{% endif %}</p>
+    </div>
+    <div class="card feature-card stagger-in">
+        <div class="feature-icon">3</div>
+        <h3>{% if request.session.django_language == 'hi' %}ज़रूरत पर सुरक्षित सहायता बढ़ाएँ{% elif request.session.django_language == 'gu' %}જરૂર પડે ત્યારે સુરક્ષિત રીતે સહાય વધારો{% else %}Escalate safely when needed{% endif %}</h3>
+        <p>{% if request.session.django_language == 'hi' %}हाई-रिस्क पैटर्न पर तुरंत सुझाव और काउंसलर विजिबिलिटी मिलती है।{% elif request.session.django_language == 'gu' %}ઉચ્ચ જોખમ પેટર્ન પર તરત સૂચનો અને કાઉન્સેલર વિઝિબિલિટી મળે છે.{% else %}High-risk patterns can trigger immediate recommendations and counsellor visibility for faster support.{% endif %}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}पर्सनल ट्रेंड{% elif request.session.django_language == 'gu' %}વ્યક્તિગત ટ્રેન્ડ{% else %}Personal Trend{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}आपका 7-दिवसीय असेसमेंट ट्रेंड{% elif request.session.django_language == 'gu' %}તમારો 7-દિવસીય મૂલ્યાંકન ટ્રેન્ડ{% else %}Your 7-day assessment trend{% endif %}</h2>
+        <p class="muted-small">{% if request.session.django_language == 'hi' %}यह ग्राफ आपके हाल के PHQ + GAD संयुक्त स्कोर दिखाता है।{% elif request.session.django_language == 'gu' %}આ ગ્રાફ તમારા તાજેતરના PHQ + GAD સંયુક્ત સ્કોર દર્શાવે છે.{% else %}Line shows your recent PHQ + GAD combined score snapshots. Higher score means you may need faster support.{% endif %}</p>
+        <div class="chart-shell">
+            <canvas id="studentRiskTrendChart"></canvas>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}कम्युनिटी फीड{% elif request.session.django_language == 'gu' %}સમુદાય ફીડ{% else %}Community Feed{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}नवीनतम छात्र पोस्ट{% elif request.session.django_language == 'gu' %}નવીનતમ વિદ્યાર્થી પોસ્ટ્સ{% else %}Latest student posts{% endif %}</h2>
+        {% if global_post_feed %}
+            <ul class="timeline-list">
+                {% for item in global_post_feed %}
+                    <li class="timeline-item">
+                        <div class="timeline-head">
+                            <div>
+                                <strong>{{ item.author_name }}</strong>
+                                <div class="muted-small">{{ item.post.created_at|date:"d M Y, h:i A" }}</div>
+                            </div>
+                            {% if item.post.stress_level == 'High' %}
+                                <span class="pill pill-high">{{ item.post.stress_level }}</span>
+                            {% elif item.post.stress_level == 'Medium' %}
+                                <span class="pill pill-medium">{{ item.post.stress_level }}</span>
+                            {% else %}
+                                <span class="pill pill-low">{{ item.post.stress_level }}</span>
+                            {% endif %}
+                        </div>
+                        {% if item.post.image_url %}
+                            <img src="{{ item.post.image_url }}" alt="{% if request.session.django_language == 'hi' %}पोस्ट इमेज{% elif request.session.django_language == 'gu' %}પોસ્ટ ઇમેજ{% else %}Post image{% endif %}" style="max-width: 260px; border-radius: 12px; margin-bottom: 10px;">
+                        {% endif %}
+                        <p>{{ item.post.content|default:default_image_post_text }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                <p>{% if request.session.django_language == 'hi' %}अभी कोई सार्वजनिक पोस्ट नहीं है।{% elif request.session.django_language == 'gu' %}હજુ સુધી કોઈ જાહેર પોસ્ટ નથી.{% else %}No public posts yet.{% endif %}</p>
+            </div>
+        {% endif %}
+        <a href="{% url 'student:community_posts' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}सभी पोस्ट देखें{% elif request.session.django_language == 'gu' %}બધી પોસ્ટ્સ જુઓ{% else %}Show all posts{% endif %}</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}आपकी दैनिक पोस्ट{% elif request.session.django_language == 'gu' %}તમારી દૈનિક પોસ્ટ્સ{% else %}Your Daily Posts{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}हाल के चेक-इन{% elif request.session.django_language == 'gu' %}તાજેતરના ચેક-ઇન{% else %}Recent check-ins{% endif %}</h2>
+        <form method="post" action="{% url 'student:community_posts' %}" enctype="multipart/form-data" style="margin-bottom: 16px;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="quick-post-content">{% if request.session.django_language == 'hi' %}त्वरित दैनिक पोस्ट{% elif request.session.django_language == 'gu' %}ઝડપી દૈનિક પોસ્ટ{% else %}Quick daily post{% endif %}</label>
+                <textarea id="quick-post-content" name="content" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}अपना चेक-इन लिखें (फोटो अपलोड हो तो वैकल्पिक)...{% elif request.session.django_language == 'gu' %}તમારો ચેક-ઇન લખો (ફોટો અપલોડ હોય તો વૈકલ્પિક)...{% else %}Write your check-in (optional if image uploaded)...{% endif %}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="quick-post-image">{% if request.session.django_language == 'hi' %}फोटो / कैमरा (वैकल्पिक){% elif request.session.django_language == 'gu' %}ફોટો / કેમેરા (વૈકલ્પિક){% else %}Photo / Camera (optional){% endif %}</label>
+                <input id="quick-post-image" name="image" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" capture="environment">
+            </div>
+            <input type="hidden" name="language" value="{{ request.session.django_language|default:'en' }}">
+            <button type="submit" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}अभी पोस्ट करें{% elif request.session.django_language == 'gu' %}હમણાં પોસ્ટ કરો{% else %}Post now{% endif %}</button>
+        </form>
+        {% if recent_daily_posts %}
+            <ul class="timeline-list">
+                {% for item in recent_daily_posts %}
+                    <li class="timeline-item">
+                        <div class="timeline-head">
+                            <strong>{{ item.created_at|date:"d M Y, h:i A" }}</strong>
+                            {% if item.stress_level == 'High' %}
+                                <span class="pill pill-high">{{ item.stress_level }}</span>
+                            {% elif item.stress_level == 'Medium' %}
+                                <span class="pill pill-medium">{{ item.stress_level }}</span>
+                            {% else %}
+                                <span class="pill pill-low">{{ item.stress_level }}</span>
+                            {% endif %}
+                        </div>
+                        <p>{{ item.content|truncatewords:30 }}</p>
+                        <form method="post" action="{% url 'student:delete_daily_post' item.id %}" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <button type="submit" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}पोस्ट हटाएं{% elif request.session.django_language == 'gu' %}પોસ્ટ કાઢી નાખો{% else %}Delete post{% endif %}</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'student:community_posts' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}पूरा पोस्ट फीड खोलें{% elif request.session.django_language == 'gu' %}પૂર્ણ પોસ્ટ ફીડ ખોલો{% else %}Open full post feed{% endif %}</a>
+        {% else %}
+            <div class="empty-state">
+                <p>{% if request.session.django_language == 'hi' %}अभी कोई दैनिक पोस्ट नहीं हुई है। अपनी पहली अपडेट शेयर करें।{% elif request.session.django_language == 'gu' %}હજુ સુધી દૈનિક પોસ્ટ નથી. તમારી પહેલી અપડેટ શેર કરો.{% else %}No daily check-in posted yet. Share your first update from the post feed.{% endif %}</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}काउंसलर चैट{% elif request.session.django_language == 'gu' %}કાઉન્સેલર ચેટ{% else %}Counsellor Chat{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}काउंसलर से बातचीत{% elif request.session.django_language == 'gu' %}કાઉન્સેલર સાથે વાતચીત{% else %}Chat with your Counsellor{% endif %}</h2>
+
+        {% if counsellor_messages or student_replies %}
+            {% comment %}Build merged thread{% endcomment %}
+            <div class="chat-box" id="counsellor-chat-box" style="height:320px;">
+                {% for note in counsellor_messages %}
+                    <div class="chat-message bot">
+                        <div class="chat-bubble">
+                            <strong>Counsellor</strong><br>
+                            {{ note.message }}
+                            <div class="muted-small" style="margin-top:4px;font-size:0.78rem;">{{ note.created_at|date:"d M, h:i A" }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% for reply in student_replies %}
+                    <div class="chat-message user">
+                        <div class="chat-bubble">
+                            {{ reply.message }}
+                            <div style="margin-top:4px;font-size:0.78rem;opacity:0.7;">{{ reply.created_at|date:"d M, h:i A" }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state"><p>No messages yet. Your counsellor will reach out soon.</p></div>
+        {% endif %}
+
+        {% if counsellor_messages %}
+            <form method="post" action="{% url 'student:reply_counsellor' %}" style="margin-top:14px;">
+                {% csrf_token %}
+                <input type="hidden" name="counsellor_id" value="{{ counsellor_messages.0.counsellor_id }}">
+                <div class="chat-composer">
+                    <input type="text" name="message" class="form-control" placeholder="Reply to your counsellor..." required>
+                    <button type="submit" class="btn">Send</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}केयर प्लान{% elif request.session.django_language == 'gu' %}કેર પ્લાન{% else %}Care Plan{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}काउंसलर की रिकवरी टास्क{% elif request.session.django_language == 'gu' %}કાઉન્સેલર દ્વારા આપવામાં આવેલી રિકવરી ટાસ્ક્સ{% else %}Counsellor assigned recovery tasks{% endif %}</h2>
+        {% if latest_session_note and latest_session_note.next_follow_up_date %}
+            <p class="muted-small">{% if request.session.django_language == 'hi' %}अगली फॉलो-अप तारीख{% elif request.session.django_language == 'gu' %}આગામી ફોલો-અપ તારીખ{% else %}Next follow-up date{% endif %}: {{ latest_session_note.next_follow_up_date }}</p>
+        {% endif %}
+        {% if care_tasks %}
+            <ul class="timeline-list">
+                {% for task in care_tasks %}
+                    <li class="timeline-item">
+                        <div class="timeline-head">
+                            <strong>{{ task.title }}</strong>
+                            {% if task.status == 'Completed' %}
+                                <span class="pill pill-low">{% if request.session.django_language == 'hi' %}पूर्ण{% elif request.session.django_language == 'gu' %}પૂર્ણ{% else %}Completed{% endif %}</span>
+                            {% else %}
+                                <span class="pill pill-medium">{% if request.session.django_language == 'hi' %}लंबित{% elif request.session.django_language == 'gu' %}બાકી{% else %}Pending{% endif %}</span>
+                            {% endif %}
+                        </div>
+                        {% if task.details %}<p>{{ task.details }}</p>{% endif %}
+                        {% if task.due_date %}<p class="muted-small">{% if request.session.django_language == 'hi' %}ड्यू तारीख{% elif request.session.django_language == 'gu' %}ડ્યુ તારીખ{% else %}Due{% endif %}: {{ task.due_date }}</p>{% endif %}
+                        {% if task.status != 'Completed' %}
+                            <form method="post" action="{% url 'student:complete_care_task' task.id %}" style="margin-top: 8px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                <button type="submit" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}टास्क पूरा किया{% elif request.session.django_language == 'gu' %}ટાસ્ક પૂર્ણ કર્યું{% else %}Mark done{% endif %}</button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state"><p>{% if request.session.django_language == 'hi' %}अभी कोई केयर टास्क असाइन नहीं है।{% elif request.session.django_language == 'gu' %}હજુ સુધી કોઈ કેર ટાસ્ક અસાઇન નથી.{% else %}No care tasks assigned yet.{% endif %}</p></div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}चयनित संसाधन{% elif request.session.django_language == 'gu' %}ફીચર્ડ સ્રોતો{% else %}Featured Resources{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}सुझाया गया वेलनेस कंटेंट{% elif request.session.django_language == 'gu' %}ભલામણ કરાયેલ વેલનેસ સામગ્રી{% else %}Recommended wellness content{% endif %}</h2>
+        <div class="resource-grid">
+            {% for item in recent_meditations %}
+                <article class="resource-card">
+                    <div class="resource-meta">
+                        <span class="meta-chip">{% if request.session.django_language == 'hi' %}मेडिटेशन{% elif request.session.django_language == 'gu' %}મેડિટેશન{% else %}Meditation{% endif %}</span>
+                        <span class="meta-chip">{{ item.duration|default:"-" }} min</span>
+                    </div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description|truncatewords:22 }}</p>
+                    <a href="{% url 'student:meditation_detail' item.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}सेशन शुरू करें{% elif request.session.django_language == 'gu' %}સેશન શરૂ કરો{% else %}Start session{% endif %}</a>
+                </article>
+            {% endfor %}
+            {% for item in recent_breathing %}
+                <article class="resource-card">
+                    <div class="resource-meta">
+                        <span class="meta-chip">{% if request.session.django_language == 'hi' %}ब्रीदिंग{% elif request.session.django_language == 'gu' %}બ્રેધિંગ{% else %}Breathing{% endif %}</span>
+                        <span class="meta-chip">{{ item.duration|default:"-" }} min</span>
+                    </div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description|truncatewords:22 }}</p>
+                    <a href="{% url 'student:breathing_detail' item.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}अभी अभ्यास करें{% elif request.session.django_language == 'gu' %}હમણાં અભ્યાસ કરો{% else %}Practice now{% endif %}</a>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section grid grid-2">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}वेलनेस टूल्स{% elif request.session.django_language == 'gu' %}વેલનેસ ટૂલ્સ{% else %}Wellness Tools{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}पूरा टूलकिट एक्सप्लोर करें{% elif request.session.django_language == 'gu' %}પૂર્ણ ટૂલકિટ શોધો{% else %}Explore the full toolkit{% endif %}</h2>
+        <div class="quick-grid">
+            <a href="{% url 'student:meditation_list' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}मेडिटेशन लाइब्रेरी{% elif request.session.django_language == 'gu' %}મેડિટેશન લાઇબ્રેરી{% else %}Meditation library{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}फोकस, नींद और भावनात्मक संतुलन के लिए शांत गाइडेड सेशन देखें।{% elif request.session.django_language == 'gu' %}ફોકસ, ઊંઘ અને ભાવનાત્મક સંતુલન માટે શાંતિસભર માર્ગદર્શિત સેશન જુઓ.{% else %}Browse calming guided sessions for focus, sleep, and emotional regulation.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:breathing_list' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}ब्रीदिंग एक्सरसाइज{% elif request.session.django_language == 'gu' %}બ્રેધિંગ વ્યાયામ{% else %}Breathing exercises{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}पैनिक, तनाव और एकाग्रता के लिए प्रमाण-आधारित ब्रीदिंग पैटर्न अपनाएं।{% elif request.session.django_language == 'gu' %}પેનિક, તણાવ અને એકાગ્રતા માટે વૈજ્ઞાનિક બ્રેધિંગ પેટર્ન અપનાવો.{% else %}Use evidence-based breathing patterns for panic, stress, and concentration support.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:journal_list' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}पर्सनल जर्नल{% elif request.session.django_language == 'gu' %}વ્યક્તિગત જર્નલ{% else %}Personal journal{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}दैनिक मूड लिखें, भावनाओं को समझें और समय के साथ जागरूकता बढ़ाएं।{% elif request.session.django_language == 'gu' %}દૈનિક મૂડ નોંધો, લાગણીઓ સમજો અને સમય સાથે જાગૃતતા વધારો.{% else %}Capture daily mood, process feelings, and build awareness over time.{% endif %}</span>
+            </a>
+            <a href="{% url 'student:motivation_list' %}" class="quick-link">
+                <strong>{% if request.session.django_language == 'hi' %}मोटिवेशनल कंटेंट{% elif request.session.django_language == 'gu' %}મોટિવેશનલ સામગ્રી{% else %}Motivational content{% endif %}</strong>
+                <span>{% if request.session.django_language == 'hi' %}जब दृष्टिकोण चाहिए हो, प्रोत्साहन देने वाले रिकवरी-केंद्रित विचार पढ़ें।{% elif request.session.django_language == 'gu' %}જ્યારે દૃષ્ટિકોણ જોઈએ ત્યારે પ્રેરક અને પુનઃપ્રાપ્તિ કેન્દ્રિત વિચાર વાંચો.{% else %}Read encouraging, recovery-oriented reflections when you need perspective.{% endif %}</span>
+            </a>
+        </div>
+    </div>
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}आज का बूस्ट{% elif request.session.django_language == 'gu' %}આજનો બૂસ્ટ{% else %}Today's Boost{% endif %}</span>
+        <h2>{% if request.session.django_language == 'hi' %}छोटी मदद, सही समय पर{% elif request.session.django_language == 'gu' %}નાની સહાય, યોગ્ય સમયે{% else %}Small support, right on time{% endif %}</h2>
+        {% if recent_motivation %}
+            {% for item in recent_motivation %}
+                <article class="resource-card" style="margin-bottom: 18px;">
+                    <div class="resource-meta">
+                        <span class="meta-chip">{{ item.category|default:default_inspiration_text }}</span>
+                        {% if item.author %}<span class="meta-chip">{{ item.author }}</span>{% endif %}
+                    </div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.content|truncatewords:32 }}</p>
+                    <a href="{% url 'student:motivation_detail' item.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}और पढ़ें{% elif request.session.django_language == 'gu' %}વધુ વાંચો{% else %}Read more{% endif %}</a>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>{% if request.session.django_language == 'hi' %}वेलनेस लाइब्रेरी भरने के बाद यहां मोटिवेशनल कंटेंट दिखाई देगा।{% elif request.session.django_language == 'gu' %}વેલનેસ લાઇબ્રેરી ભરાયા પછી અહીં મોટિવેશનલ સામગ્રી દેખાશે.{% else %}Motivational content will appear here once the wellness library is populated.{% endif %}</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const trendCtx = document.getElementById('studentRiskTrendChart').getContext('2d');
+new Chart(trendCtx, {
+    type: 'line',
+    data: {
+        labels: {{ trend_labels_json|safe }},
+        datasets: [{
+            label: "{% if request.session.django_language == 'hi' %}PHQ + GAD स्कोर{% elif request.session.django_language == 'gu' %}PHQ + GAD સ્કોર{% else %}PHQ + GAD{% endif %}",
+            data: {{ trend_values_json|safe }},
+            borderColor: '#6d90c7',
+            backgroundColor: 'rgba(109, 144, 199, 0.18)',
+            fill: true,
+            tension: 0.35
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true },
+            x: { grid: { display: false } }
+        }
+    }
+});
+</script>
+{% endblock %}

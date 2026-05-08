@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}सेशन शेड्यूल करें{% elif request.session.django_language == 'gu' %}સેશન શેડ્યૂલ કરો{% else %}Schedule Session{% endif %} - {{ student.name }}{% endblock %}
+{% block content %}
+<section class="auth-shell" style="max-width: 760px;">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}काउंसलर एक्शन{% elif request.session.django_language == 'gu' %}કાઉન્સેલર એક્શન{% else %}Counsellor Action{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}{{ student.name }} के लिए सेशन शेड्यूल करें{% elif request.session.django_language == 'gu' %}{{ student.name }} માટે સેશન શેડ્યૂલ કરો{% else %}Schedule session for {{ student.name }}{% endif %}</h1>
+        <p class="lead">{% if request.session.django_language == 'hi' %}फॉलो-अप सेशन बनाएं और छात्र को संरचित सपोर्ट में लाएं।{% elif request.session.django_language == 'gu' %}ફોલો-અપ સેશન બનાવો અને વિદ્યાર્થીને સ્ટ્રક્ચર્ડ સપોર્ટમાં લાવો.{% else %}Create a follow-up session and bring the student into a more structured support flow.{% endif %}</p>
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date">{% if request.session.django_language == 'hi' %}सेशन तारीख{% elif request.session.django_language == 'gu' %}સેશન તારીખ{% else %}Session date{% endif %}</label>
+                <input type="date" name="date" id="date" class="form-control" required>
+            </div>
+            <div class="button-row">
+                <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}सेशन शेड्यूल करें{% elif request.session.django_language == 'gu' %}સેશન શેડ્યૂલ કરો{% else %}Schedule session{% endif %}</button>
+                <a href="{% url 'counsellor:counsellor_dashboard' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}वापस जाएं{% elif request.session.django_language == 'gu' %}પાછા જાઓ{% else %}Back to dashboard{% endif %}</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

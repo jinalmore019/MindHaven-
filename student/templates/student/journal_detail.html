@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Journal Entry – Wellness Connect{% endblock %}
+{% block content %}
+<h1>📔 Journal Entry</h1>
+<p><a href="{% url 'student:journal_list' %}" class="btn">Back to Entries</a></p>
+
+<div class="card">
+    <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ddd;">
+        <p><strong>Date:</strong> {{ entry.created_at|date:"Y-m-d H:i" }}</p>
+        <p><strong>Mood:</strong> {{ entry.mood|default:"Not specified" }}</p>
+        <p><strong>Stress Level:</strong> {{ entry.stress_level|default:"–" }}</p>
+    </div>
+
+    <div style="line-height: 1.8; white-space: pre-wrap; margin-bottom: 24px;">
+        {{ entry.content }}
+    </div>
+
+    <form method="post" action="{% url 'student:journal_delete' entry.id %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background: #dc3545;" onclick="return confirm('Delete this entry? This cannot be undone.')">Delete Entry</button>
+    </form>
+</div>
+{% endblock %}

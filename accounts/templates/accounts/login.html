@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}लॉगिन{% elif request.session.django_language == 'gu' %}લૉગિન{% else %}Login{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="auth-shell">
+    <div class="card stagger-in">
+        <span class="eyebrow">{% if request.session.django_language == 'hi' %}सुरक्षित एक्सेस{% elif request.session.django_language == 'gu' %}સુરક્ષિત એક્સેસ{% else %}Secure Access{% endif %}</span>
+        <h1>{% if request.session.django_language == 'hi' %}Wellify में वापस स्वागत है{% elif request.session.django_language == 'gu' %}Wellify માં પાછા આવવા બદલ સ્વાગત{% else %}Welcome back to Wellify{% endif %}</h1>
+        <p class="lead">{% if request.session.django_language == 'hi' %}अपनी वेलनेस यात्रा जारी रखने के लिए साइन इन करें।{% elif request.session.django_language == 'gu' %}તમારી વેલનેસ યાત્રા ચાલુ રાખવા સાઇન ઇન કરો.{% else %}Sign in to continue your wellness journey.{% endif %}</p>
+        <form method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">{% if request.session.django_language == 'hi' %}ईमेल{% elif request.session.django_language == 'gu' %}ઈમેઈલ{% else %}Email{% endif %}</label>
+                <input type="email" name="username" id="id_username" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}अपना ईमेल डालें{% elif request.session.django_language == 'gu' %}તમારો ઈમેઈલ દાખલ કરો{% else %}Enter your email{% endif %}" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="id_password">{% if request.session.django_language == 'hi' %}पासवर्ड{% elif request.session.django_language == 'gu' %}પાસવર્ડ{% else %}Password{% endif %}</label>
+                <input type="password" name="password" id="id_password" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}अपना पासवर्ड डालें{% elif request.session.django_language == 'gu' %}તમારો પાસવર્ડ દાખલ કરો{% else %}Enter your password{% endif %}" required>
+            </div>
+            <div class="form-group">
+                <label for="id_role">{% if request.session.django_language == 'hi' %}लॉगिन करें{% elif request.session.django_language == 'gu' %}લૉગિન કરો{% else %}Login as{% endif %}</label>
+                <select name="role" id="id_role" class="form-control" required>
+                    <option value="">{% if request.session.django_language == 'hi' %}अपना रोल चुनें{% elif request.session.django_language == 'gu' %}તમારો રોલ પસંદ કરો{% else %}Select your role{% endif %}</option>
+                    <option value="Student">{% if request.session.django_language == 'hi' %}छात्र{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી{% else %}Student{% endif %}</option>
+                    <option value="Counsellor">{% if request.session.django_language == 'hi' %}काउंसलर{% elif request.session.django_language == 'gu' %}કાઉન્સેલર{% else %}Counsellor{% endif %}</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}लॉगिन{% elif request.session.django_language == 'gu' %}લૉગિન{% else %}Login{% endif %}</button>
+                <a href="{% url 'accounts:register' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}अकाउंट बनाएं{% elif request.session.django_language == 'gu' %}એકાઉન્ટ બનાવો{% else %}Create account{% endif %}</a>
+            </div>
+        </form>
+        <p style="margin-top:14px;">
+            {% if request.session.django_language == 'hi' %}पासवर्ड भूल गए?{% elif request.session.django_language == 'gu' %}પાસવર્ડ ભૂલ્યા?{% else %}Forgot your password?{% endif %}
+            <a href="{% url 'accounts:password_reset' %}" style="color:var(--secondary);">{% if request.session.django_language == 'hi' %}यहाँ रीसेट करें{% elif request.session.django_language == 'gu' %}અહીં રીસેટ કરો{% else %}Reset it here{% endif %}</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

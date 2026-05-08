@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}चैट - {{ student.name }}{% elif request.session.django_language == 'gu' %}ચેટ - {{ student.name }}{% else %}Chat - {{ student.name }}{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">{% if request.session.django_language == 'hi' %}छात्र सपोर्ट{% elif request.session.django_language == 'gu' %}વિદ્યાર્થી સપોર્ટ{% else %}Student Support{% endif %}</span>
+    <h1>{{ student.name }}</h1>
+    <div class="button-row">
+        <a href="{% url 'counsellor:counsellor_dashboard' %}" class="btn btn-secondary">← {% if request.session.django_language == 'hi' %}वापस{% elif request.session.django_language == 'gu' %}પાછા{% else %}Back{% endif %}</a>
+        <a href="{% url 'counsellor:schedule_session' student.id %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}सेशन शेड्यूल करें{% elif request.session.django_language == 'gu' %}સેશન શેડ્યૂલ કરો{% else %}Schedule Session{% endif %}</a>
+        <form method="post" action="{% url 'counsellor:emergency_flag' student.id %}" onsubmit="return confirm('{% if request.session.django_language == 'hi' %}{{ student.name }} के लिए इमरजेंसी फ्लैग सेट करें?{% elif request.session.django_language == 'gu' %}{{ student.name }} માટે ઇમરજન્સી ફ્લેગ સેટ કરો?{% else %}Set Emergency Flag for {{ student.name }}?{% endif %}')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">🚨 {% if request.session.django_language == 'hi' %}इमरजेंसी फ्लैग{% elif request.session.django_language == 'gu' %}ઇમરજન્સી ફ્લેગ{% else %}Emergency Flag{% endif %}</button>
+        </form>
+    </div>
+</section>
+
+<section class="split-panel section">
+    <!-- LEFT: 2-way Chat -->
+    <div class="card stagger-in">
+        <h2>💬 Live Chat with {{ student.name }}</h2>
+        <div class="chat-box" id="chat-box" style="height:400px;">
+            {% if chat_thread %}
+                {% for item in chat_thread %}
+                    {% if item.sender == 'counsellor' %}
+                        <div class="chat-message user">
+                            <div class="chat-bubble">
+                                <strong>You (Counsellor)</strong><br>
+                                {{ item.message }}
+                                <div style="margin-top:4px;font-size:0.78rem;opacity:0.7;">{{ item.created_at|date:"d M, h:i A" }}</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="chat-message bot">
+                            <div class="chat-bubble">
+                                <strong>{{ item.name }}</strong><br>
+                                {{ item.message }}
+                                <div class="muted-small" style="margin-top:4px;font-size:0.78rem;">{{ item.created_at|date:"d M, h:i A" }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>No messages yet. Start the conversation below.</p></div>
+            {% endif %}
+        </div>
+
+        <!-- Send Message -->
+        <form method="post" action="{% url 'counsellor:send_student_message' student.id %}" style="margin-top:14px;">
+            {% csrf_token %}
+            <div class="chat-composer">
+                <input type="text" name="message" class="form-control" placeholder="Type a message to {{ student.name }}..." required>
+                <button type="submit" class="btn">Send</button>
+            </div>
+        </form>
+
+        <hr style="margin:22px 0;border-color:rgba(132,157,207,0.2);">
+
+        <!-- AI Chatbot History -->
+        <h2>🤖 AI Chatbot History</h2>
+        {% if chat_logs %}
+            <div class="chat-box" style="height:280px;">
+                {% for log in chat_logs %}
+                    <div class="chat-message user">
+                        <div class="chat-bubble">{{ log.message }}</div>
+                    </div>
+                    <div class="chat-message bot">
+                        <div class="chat-bubble">{{ log.response|truncatewords:40 }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state"><p>No AI chat history.</p></div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT: Student Info + Tools -->
+    <aside>
+        <!-- Student Snapshot -->
+        <div class="card stagger-in" style="margin-bottom:18px;">
+            <span class="eyebrow">Student Snapshot</span>
+            <p><strong>Email:</strong> {{ student.email }}</p>
+            <p><strong>Stress:</strong>
+                {% if student.current_stress_level == 'High' %}
+                    <span class="pill pill-high">{{ student.current_stress_level }}</span>
+                {% elif student.current_stress_level == 'Medium' %}
+                    <span class="pill pill-medium">{{ student.current_stress_level }}</span>
+                {% else %}
+                    <span class="pill pill-low">{{ student.current_stress_level }}</span>
+                {% endif %}
+            </p>
+            <p><strong>Risk Score:</strong> {{ student.risk_score }}</p>
+            {% if latest_assessment %}
+                <p><strong>PHQ-9:</strong> {{ latest_assessment.phq_score|default:"-" }}</p>
+                <p><strong>GAD-7:</strong> {{ latest_assessment.gad_score|default:"-" }}</p>
+                <p><strong>Level:</strong> {{ latest_assessment.final_level|default:latest_assessment.stress_level }}</p>
+            {% else %}
+                <p class="muted-small">No assessment yet.</p>
+            {% endif %}
+
+            <!-- Risk Override -->
+            <hr style="margin:14px 0;border-color:rgba(132,157,207,0.2);">
+            <h3>⚡ Override Risk Level</h3>
+            <form method="post" action="{% url 'counsellor:risk_override' student.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <select name="risk_level" class="form-control">
+                        <option value="Low" {% if student.current_stress_level == 'Low' %}selected{% endif %}>Low</option>
+                        <option value="Medium" {% if student.current_stress_level == 'Medium' %}selected{% endif %}>Medium</option>
+                        <option value="High" {% if student.current_stress_level == 'High' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Update Risk</button>
+            </form>
+        </div>
+
+        <!-- Session Note -->
+        <div class="card stagger-in" style="margin-bottom:18px;">
+            <h3>📋 Session Note</h3>
+            <form method="post" action="/counsellor/student/{{ student.id }}/session-note/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Summary</label>
+                    <textarea name="summary" class="form-control" required placeholder="What did you observe?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Action Plan</label>
+                    <textarea name="action_plan" class="form-control" placeholder="Next steps..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Follow-up Date</label>
+                    <input type="date" name="next_follow_up_date" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-secondary">Save Note</button>
+            </form>
+        </div>
+
+        <!-- Assign Care Task -->
+        <div class="card stagger-in">
+            <h3>✅ Assign Care Task</h3>
+            <form method="post" action="/counsellor/student/{{ student.id }}/care-task/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Task</label>
+                    <input type="text" name="title" class="form-control" required placeholder="e.g. 10 min meditation daily">
+                </div>
+                <div class="form-group">
+                    <label>Details</label>
+                    <textarea name="details" class="form-control" placeholder="Instructions..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-secondary">Assign Task</button>
+            </form>
+        </div>
+    </aside>
+</section>
+
+<!-- Session Notes + Care Tasks -->
+<section class="section" id="session-notes">
+    <div class="card stagger-in" style="border: 2px solid rgba(88,164,135,0.4);">
+        <span class="eyebrow" style="background:rgba(88,164,135,0.15);color:#58a487;">📋 Session Notes ({{ session_notes|length }} saved)</span>
+        <h2>Clinical Trail</h2>
+        {% if session_notes %}
+            {% for note in session_notes %}
+            <div style="padding:16px;margin-bottom:12px;border-radius:12px;background:rgba(88,164,135,0.08);border:1px solid rgba(88,164,135,0.2);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <strong style="color:#58a487;">{{ note.created_at|date:"d M Y, h:i A" }}</strong>
+                    {% if note.next_follow_up_date %}<span class="pill pill-medium">Follow-up: {{ note.next_follow_up_date }}</span>{% endif %}
+                </div>
+                <p style="margin:0 0 6px;"><strong>Summary:</strong> {{ note.summary }}</p>
+                {% if note.action_plan %}<p style="margin:0;"><strong>Plan:</strong> {{ note.action_plan }}</p>{% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state"><p>No session notes yet. Add one from the form above.</p></div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="card stagger-in">
+        <span class="eyebrow">✅ Care Tasks ({{ care_tasks|length }} assigned)</span>
+        <h2>Assigned Tasks</h2>
+        {% if care_tasks %}
+            {% for task in care_tasks %}
+            <div style="padding:14px;margin-bottom:10px;border-radius:12px;background:rgba(109,144,199,0.08);border:1px solid rgba(109,144,199,0.2);">
+                <div style="display:flex;justify-content:space-between;">
+                    <strong>{{ task.title }}</strong>
+                    {% if task.status == 'Completed' %}
+                        <span class="pill pill-low">Done</span>
+                    {% else %}
+                        <span class="pill pill-medium">Pending</span>
+                    {% endif %}
+                </div>
+                {% if task.details %}<p style="margin:6px 0 0;">{{ task.details }}</p>{% endif %}
+                {% if task.due_date %}<p class="muted-small" style="margin:4px 0 0;">Due: {{ task.due_date }}</p>{% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state"><p>No tasks assigned yet.</p></div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+const chatBox = document.getElementById('chat-box');
+if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+if (window.location.hash === '#session-notes') {
+    setTimeout(function() {
+        const el = document.getElementById('session-notes');
+        if (el) el.scrollIntoView({behavior: 'smooth'});
+    }, 200);
+}
+</script>
+{% endblock %}

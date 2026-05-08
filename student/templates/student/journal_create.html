@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}{% if request.session.django_language == 'hi' %}जर्नल लिखें{% elif request.session.django_language == 'gu' %}જર્નલ લખો{% else %}Write Journal{% endif %} - Wellify{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">{% if request.session.django_language == 'hi' %}नई एंट्री{% elif request.session.django_language == 'gu' %}નવી એન્ટ્રી{% else %}New Entry{% endif %}</span>
+    <h1>{% if request.session.django_language == 'hi' %}अपने जर्नल में लिखें{% elif request.session.django_language == 'gu' %}તમારા જર્નલમાં લખો{% else %}Write in Your Journal{% endif %}</h1>
+    <div class="button-row">
+        <a href="{% url 'student:journal_list' %}" class="btn btn-secondary">{% if request.session.django_language == 'hi' %}एंट्रीज पर वापस{% elif request.session.django_language == 'gu' %}એન્ટ્રીઝ પર પાછા{% else %}Back to Entries{% endif %}</a>
+    </div>
+</section>
+
+<div class="card stagger-in" style="max-width:760px;margin:0 auto;">
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="mood">{% if request.session.django_language == 'hi' %}आप कैसा महसूस कर रहे हैं?{% elif request.session.django_language == 'gu' %}તમે કેવું અનુભવો છો?{% else %}How are you feeling?{% endif %}</label>
+            <select name="mood" id="mood" class="form-control">
+                <option value="">{% if request.session.django_language == 'hi' %}मूड चुनें...{% elif request.session.django_language == 'gu' %}મૂડ પસંદ કરો...{% else %}Select a mood...{% endif %}</option>
+                <option value="Happy">😊 {% if request.session.django_language == 'hi' %}खुश{% elif request.session.django_language == 'gu' %}ખુશ{% else %}Happy{% endif %}</option>
+                <option value="Calm">😌 {% if request.session.django_language == 'hi' %}शांत{% elif request.session.django_language == 'gu' %}શાંત{% else %}Calm{% endif %}</option>
+                <option value="Anxious">😰 {% if request.session.django_language == 'hi' %}चिंतित{% elif request.session.django_language == 'gu' %}ચિંતિત{% else %}Anxious{% endif %}</option>
+                <option value="Sad">😢 {% if request.session.django_language == 'hi' %}उदास{% elif request.session.django_language == 'gu' %}ઉદાસ{% else %}Sad{% endif %}</option>
+                <option value="Neutral">😐 {% if request.session.django_language == 'hi' %}सामान्य{% elif request.session.django_language == 'gu' %}સામાન્ય{% else %}Neutral{% endif %}</option>
+                <option value="Motivated">💪 {% if request.session.django_language == 'hi' %}प्रेरित{% elif request.session.django_language == 'gu' %}પ્રેરિત{% else %}Motivated{% endif %}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="content">{% if request.session.django_language == 'hi' %}आपके मन में क्या है?{% elif request.session.django_language == 'gu' %}તમારા મનમાં શું છે?{% else %}What's on your mind?{% endif %}</label>
+            <textarea name="content" id="content" class="form-control" placeholder="{% if request.session.django_language == 'hi' %}अपने विचार, भावनाएं और अनुभव स्वतंत्र रूप से लिखें...{% elif request.session.django_language == 'gu' %}તમારા વિચારો, લાગણીઓ અને અનુભવો મુક્તપણે લખો...{% else %}Write freely about your thoughts, feelings, and experiences...{% endif %}" required></textarea>
+        </div>
+        <p class="muted-small">
+            💡 {% if request.session.django_language == 'hi' %}जर्नलिंग का कोई सही या गलत तरीका नहीं है। जो मन में आए लिखें। यह आपकी सुरक्षित जगह है।{% elif request.session.django_language == 'gu' %}જર્નલ લખવાની કોઈ સાચી કે ખોટી રીત નથી. જે મનમાં આવે તે લખો. આ તમારી સુરક્ષિત જગ્યા છે.{% else %}There's no right or wrong way to journal. Write whatever comes to mind. This is your safe space.{% endif %}
+        </p>
+        <div class="button-row" style="margin-top:16px;">
+            <button type="submit" class="btn">{% if request.session.django_language == 'hi' %}एंट्री सेव करें{% elif request.session.django_language == 'gu' %}એન્ટ્રી સેવ કરો{% else %}Save Entry{% endif %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

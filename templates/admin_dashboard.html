@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard – Wellness Connect{% endblock %}
+{% block content %}
+<h1>Welcome, {{ user.name }}!</h1>
+<p style="color: #666; margin-bottom: 24px;">Admin Dashboard</p>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">System Statistics</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px;">
+        <div style="padding: 16px; background: #e3f2fd; border-radius: 6px; text-align: center;">
+            <div style="font-size: 32px; font-weight: bold; color: #1976d2;">0</div>
+            <div style="color: #666; margin-top: 4px;">Total Users</div>
+        </div>
+        <div style="padding: 16px; background: #fff3e0; border-radius: 6px; text-align: center;">
+            <div style="font-size: 32px; font-weight: bold; color: #f57c00;">0</div>
+            <div style="color: #666; margin-top: 4px;">Active Students</div>
+        </div>
+        <div style="padding: 16px; background: #f3e5f5; border-radius: 6px; text-align: center;">
+            <div style="font-size: 32px; font-weight: bold; color: #7b1fa2;">0</div>
+            <div style="color: #666; margin-top: 4px;">Appointments</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">User Management</h2>
+    <p>Manage users, roles, and system settings.</p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+        <a href="/admin/" class="btn" style="flex: 1; min-width: 150px; text-align: center;">
+            👥 Manage Users
+        </a>
+        <a href="#" class="btn" style="flex: 1; min-width: 150px; text-align: center;">
+            📊 View Reports
+        </a>
+        <a href="#" class="btn" style="flex: 1; min-width: 150px; text-align: center;">
+            ⚙️ System Settings
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0; color: #2d5a87;">Quick Actions</h2>
+    <ul style="line-height: 1.8;">
+        <li>View and manage all users in the system</li>
+        <li>Monitor system statistics and reports</li>
+        <li>Configure system settings and permissions</li>
+        <li>Access Django admin panel for advanced management</li>
+    </ul>
+</div>
+{% endblock %}

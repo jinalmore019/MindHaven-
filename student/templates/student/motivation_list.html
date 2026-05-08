@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Motivational Content - Wellness Connect{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">Mindset Feed</span>
+    <h1>Daily inspiration and perspective</h1>
+    <p class="lead">A curated feed of uplifting reflections, resilience reminders, and supportive content for difficult days.</p>
+    <div class="button-row">
+        <a href="{% url 'student:student_dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+    </div>
+</section>
+
+<div class="card stagger-in">
+    {% if content %}
+    <div class="resource-grid">
+        {% for item in content %}
+        <div class="resource-card">
+            {% if item.image_url %}
+            <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 18px;">
+            {% endif %}
+            <div class="resource-meta">
+                {% if item.category %}<span class="meta-chip">{{ item.category }}</span>{% endif %}
+                {% if item.author %}<span class="meta-chip">{{ item.author }}</span>{% endif %}
+            </div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.content|truncatewords:30 }}</p>
+            <a href="{% url 'student:motivation_detail' item.id %}" class="btn btn-secondary">Read more</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No motivational content available yet. Run the wellness content population command to load curated articles and quotes.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

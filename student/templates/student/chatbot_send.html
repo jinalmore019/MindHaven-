@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard – Wellness Connect{% endblock %}
+{% block content %}
+<h1>Student Dashboard</h1>
+<div class="card">
+    <h2 style="margin-top:0;">Quick links</h2>
+    <p><a href="{% url 'student:assessment' %}" class="btn">PHQ-9 & GAD-7 Assessment</a></p>
+    <p><a href="{% url 'student:book_session' %}" class="btn">Book Counselling Session</a></p>
+</div>
+
+{% if user.current_stress_level == 'Low' %}
+<div class="card wellness-tools">
+    <h2 style="margin-top:0;">Wellness tools</h2>
+    <p>Meditation &amp; motivation</p>
+    <ul>
+        <li><a href="#" class="btn">Meditation videos</a></li>
+        <li><a href="#" class="btn">Motivational content</a></li>
+        <li><a href="#" class="btn">Journaling</a></li>
+    </ul>
+</div>
+{% elif user.current_stress_level == 'Medium' %}
+<div class="card wellness-tools">
+    <h2 style="margin-top:0;">Wellness tools</h2>
+    <p>Breathing exercises and support</p>
+    <ul>
+        <li><a href="#" class="btn">Breathing exercises</a></li>
+        <li><a href="{% url 'student:book_session' %}" class="btn">Book a counselling session (recommended)</a></li>
+    </ul>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2 style="margin-top:0;">Chatbot</h2>
+    <p>Type how you're feeling. Based on keywords we'll suggest support.</p>
+    {% csrf_token %}
+    <div class="form-group">
+        <input type="text" id="chat-input" class="form-control" placeholder="Type your message..." style="max-width: 400px;">
+        <button type="button" id="chat-send" class="btn" style="margin-top:8px;">Send</button>
+    </div>
+    <div id="chat-response" style="margin-top:12px; padding:12px; background:#f8f9fa; border-radius:6px; min-height:40px;"></div>
+    <div id="chat-alert" style="display:none; margin-top:12px; padding:12px; background:#f8d7da; color:#721c24; border-radius:6px;"></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('chat-input');
+    var sendBtn = document.getElementById('chat-send');
+    var responseEl = document.getElementById('chat-response');
+    var alertEl = document.getElementById('chat-alert');
+    var csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+    function getCookie(n) {
+        var v = document.cookie.match('(^|;) ?' + n + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    }
+    sendBtn.addEventListener('click', function() {
+        var msg = (input.value || '').trim();
+        if (!msg) return;
+        var csrfInput = document.querySelector('input[name=csrfmiddlewaretoken]');
+        var form = new FormData();
+        form.append('message', msg);
+        form.append('csrfmiddlewaretoken', (csrfInput && csrfInput.value) ? csrfInput.value : getCookie('csrftoken'));
+        fetch('{% url "student:chatbot_send" %}', { method: 'POST', body: form, credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                responseEl.textContent = data.response || '';
+                alertEl.style.display = data.show_alert ? 'block' : 'none';
+                alertEl.textContent = data.show_alert ? 'We recommend booking a counselling session. You are not alone.' : '';
+            })
+            .catch(function() { responseEl.textContent = 'Something went wrong.'; });
+    });
+});
+</script>
+{% endblock %}

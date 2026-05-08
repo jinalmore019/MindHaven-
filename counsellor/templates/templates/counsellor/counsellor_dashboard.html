@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block title %}Counsellor Dashboard – Wellness Connect{% endblock %}
+{% block content %}
+<h1>Counsellor Dashboard</h1>
+{% if flagged_exists %}
+<div class="alert" style="background:#f8d7da;color:#721c24;padding:12px;margin-bottom:16px;border-radius:4px;">
+    ⚠️ One or more students have been flagged HIGH risk. Please review and consider reaching out.
+</div>
+{% endif %}
+
+<div class="card">
+    <h2 style="margin-top:0;">High Risk Students <span class="badge badge-danger">High</span></h2>
+    {% if high_risk_students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Risk score</th>
+                <th>Stress level</th>
+                <th>Latest PHQ</th>
+                <th>Latest GAD</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in high_risk_students %}
+            <tr>
+                <td>{{ s.user.name }}</td>
+                <td>{{ s.user.email }}</td>
+                <td>{{ s.user.risk_score }}</td>
+                <td><span class="badge badge-danger">{{ s.user.current_stress_level }}</span></td>
+                <td>{{ s.latest_phq|default:"–" }}</td>
+                <td>{{ s.latest_gad|default:"–" }}</td>
+                <td>
+                    <a href="{% url 'counsellor:schedule_session' s.user.id %}" class="btn">Schedule Session</a>
+                    <a href="{% url 'counsellor:student_chat_history' s.user.id %}" class="btn">View Chat History</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No high risk students at the moment.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Medium Risk Students</h2>
+    {% if medium_risk_students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Risk score</th>
+                <th>Stress level</th>
+                <th>Latest PHQ</th>
+                <th>Latest GAD</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in medium_risk_students %}
+            <tr>
+                <td>{{ s.user.name }}</td>
+                <td>{{ s.user.email }}</td>
+                <td>{{ s.user.risk_score }}</td>
+                <td><span class="badge badge-warning">{{ s.user.current_stress_level }}</span></td>
+                <td>{{ s.latest_phq|default:"–" }}</td>
+                <td>{{ s.latest_gad|default:"–" }}</td>
+                <td>
+                    <a href="{% url 'counsellor:schedule_session' s.user.id %}" class="btn">Schedule Session</a>
+                    <a href="{% url 'counsellor:student_chat_history' s.user.id %}" class="btn">View Chat History</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No medium risk students at the moment.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Low Risk Students</h2>
+    {% if low_risk_students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Risk score</th>
+                <th>Stress level</th>
+                <th>Latest PHQ</th>
+                <th>Latest GAD</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in low_risk_students %}
+            <tr>
+                <td>{{ s.user.name }}</td>
+                <td>{{ s.user.email }}</td>
+                <td>{{ s.user.risk_score }}</td>
+                <td><span class="badge badge-success">{{ s.user.current_stress_level }}</span></td>
+                <td>{{ s.latest_phq|default:"–" }}</td>
+                <td>{{ s.latest_gad|default:"–" }}</td>
+                <td>
+                    <a href="{% url 'counsellor:schedule_session' s.user.id %}" class="btn">Schedule Session</a>
+                    <a href="{% url 'counsellor:student_chat_history' s.user.id %}" class="btn">View Chat History</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No low risk students at the moment.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Appointment requests</h2>
+    {% if appointments %}
+    <table>
+        <thead><tr><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+            {% for app in appointments %}
+            <tr>
+                <td>{{ app.date }}</td>
+                <td>{{ app.status }}</td>
+                <td>
+                    {% if app.status == 'Pending' %}
+                    <form method="post" action="{% url 'counsellor:appointment_update' app.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="Approved" class="btn">Approve</button>
+                    </form>
+                    {% endif %}
+                    {% if app.status == 'Pending' or app.status == 'Approved' %}
+                    <form method="post" action="{% url 'counsellor:appointment_update' app.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="Completed" class="btn">Mark Completed</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No appointments yet.</p>
+    {% endif %}
+</div>
+<style>
+.badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.badge-danger { background: #f8d7da; color: #721c24; }
+.badge-warning { background: #fff3cd; color: #856404; }
+.badge-success { background: #d4edda; color: #155724; }
+</style>
+{% endblock %}

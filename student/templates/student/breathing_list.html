@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Breathing Exercises - Wellness Connect{% endblock %}
+{% block content %}
+<section class="page-header stagger-in">
+    <span class="eyebrow">Breathing Studio</span>
+    <h1>Guided breathing exercises</h1>
+    <p class="lead">Practice evidence-based breathing patterns to reduce anxiety, calm physical stress, and improve attention.</p>
+    <div class="button-row">
+        <a href="{% url 'student:student_dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+    </div>
+</section>
+
+<div class="card stagger-in">
+    {% if exercises %}
+    <div class="resource-grid">
+        {% for e in exercises %}
+        <div class="resource-card">
+            <div class="resource-meta">
+                <span class="meta-chip">Breathing</span>
+                <span class="meta-chip">{{ e.duration|default:"-" }} min</span>
+            </div>
+            <h3>{{ e.title }}</h3>
+            <p>{{ e.description|truncatewords:20 }}</p>
+            <a href="{% url 'student:breathing_detail' e.id %}" class="btn btn-secondary">Learn and practice</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No breathing exercises available yet. Run the wellness content population command to add guided exercises.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

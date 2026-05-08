@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Schedule Session – {{ student.name }}{% endblock %}
+{% block content %}
+<h1>Schedule session for {{ student.name }}</h1>
+<p><a href="{% url 'counsellor:counsellor_dashboard' %}" class="btn">Back to Dashboard</a></p>
+<div class="card">
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" name="date" id="date" class="form-control" style="max-width:200px;" required>
+        </div>
+        <button type="submit" class="btn">Schedule Session</button>
+    </form>
+</div>
+{% endblock %}
